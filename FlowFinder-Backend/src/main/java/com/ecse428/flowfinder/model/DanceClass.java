@@ -1,7 +1,12 @@
 package com.ecse428.flowfinder.model;
 
+import jakarta.persistence.*;
+
+@Entity
 public class DanceClass {
 
+  @Id
+  @GeneratedValue
   private int id;
   private boolean isPrivate;
   private String name;
@@ -15,32 +20,20 @@ public class DanceClass {
     description = aDescription;
   }
 
-  public boolean setIsPrivate(boolean aIsPrivate) {
-    boolean wasSet = false;
+  public void setIsPrivate(boolean aIsPrivate) {
     isPrivate = aIsPrivate;
-    wasSet = true;
-    return wasSet;
   }
 
-  public boolean setName(String aName) {
-    boolean wasSet = false;
+  public void setName(String aName) {
     name = aName;
-    wasSet = true;
-    return wasSet;
   }
 
-  public boolean setGenre(String aGenre) {
-    boolean wasSet = false;
+  public void setGenre(String aGenre) {
     genre = aGenre;
-    wasSet = true;
-    return wasSet;
   }
 
-  public boolean setDescription(String aDescription) {
-    boolean wasSet = false;
+  public void setDescription(String aDescription) {
     description = aDescription;
-    wasSet = true;
-    return wasSet;
   }
 
   public int getId() {

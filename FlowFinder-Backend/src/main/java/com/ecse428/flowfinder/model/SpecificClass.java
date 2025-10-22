@@ -3,8 +3,13 @@ package com.ecse428.flowfinder.model;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import jakarta.persistence.*;
+
+@Entity
 public class SpecificClass {
 
+  @Id
+  @GeneratedValue
   private int id;
   private boolean isDeleted;
   private String location;
@@ -13,57 +18,40 @@ public class SpecificClass {
   private LocalTime start;
   private LocalTime end;
 
+  @ManyToOne
   private DanceClass danceClass;
+  @ManyToOne
   private Instructor instructor;
 
-  public SpecificClass(String aLocation, LocalDate aDate, int aLimit, LocalTime aStart, LocalTime aEnd, DanceClass aClass, Instructor aInstructor) {
-    isDeleted = false;
+  public SpecificClass(boolean aIsDeleted, String aLocation, LocalDate aDate, int aLimit, LocalTime aStart, LocalTime aEnd, DanceClass aClass, Instructor aInstructor) {
+    isDeleted = aIsDeleted;
     location = aLocation;
     date = aDate;
     limit = aLimit;
     start = aStart;
     end = aEnd;
-    if (!setDanceClass(aClass)) {
-      throw new RuntimeException("Unable to create SpecificClass due to aClass");
-    }
-    if (!setInstructor(aInstructor)) {
-      throw new RuntimeException("Unable to create SpecificClass due to aInstructor");
-    }
+    danceClass = aClass;
+    instructor = aInstructor;
   }
 
-  public boolean setLocation(String aLocation) {
-    boolean wasSet = false;
+  public void setLocation(String aLocation) {
     location = aLocation;
-    wasSet = true;
-    return wasSet;
   }
 
-  public boolean setDate(LocalDate aDate) {
-    boolean wasSet = false;
+  public void setDate(LocalDate aDate) {
     date = aDate;
-    wasSet = true;
-    return wasSet;
   }
 
-  public boolean setLimit(int aLimit) {
-    boolean wasSet = false;
+  public void setLimit(int aLimit) {
     limit = aLimit;
-    wasSet = true;
-    return wasSet;
   }
 
-  public boolean setStart(LocalTime aStart) {
-    boolean wasSet = false;
+  public void setStart(LocalTime aStart) {
     start = aStart;
-    wasSet = true;
-    return wasSet;
   }
 
-  public boolean setEnd(LocalTime aEnd) {
-    boolean wasSet = false;
+  public void setEnd(LocalTime aEnd) {
     end = aEnd;
-    wasSet = true;
-    return wasSet;
   }
 
   public int getId() {
@@ -119,13 +107,6 @@ public class SpecificClass {
     }
     return wasSet;
   }
-
-  public void delete() {
-    danceClass = null;
-    instructor = null;
-    isDeleted = true;
-  }
-
 
   public String toString() {
     return super.toString() + "["+

@@ -1,12 +1,16 @@
 package com.ecse428.flowfinder.model;
 
-import java.util.*;
 import java.time.LocalDate;
 
-public class Person {
+import jakarta.persistence.*;
 
-  private static Map<String, Person> personsByEmail = new HashMap<String, Person>();
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
+public abstract class Person {
 
+  @Id
+  @GeneratedValue
   private int id;
   private String name;
   private String bio;
@@ -15,66 +19,37 @@ public class Person {
   private LocalDate creationDate;
   private boolean isDeleted;
 
-  public Person(String aEmail, String aPassword) {
-    name = null;
-    bio = null;
-    password = aPassword;
-    creationDate = LocalDate.now();
-    isDeleted = false;
-    if (!setEmail(aEmail)) {
-      throw new RuntimeException("Cannot create due to duplicate email");
-    }
-  }
-
-  public boolean setName(String aName) {
-    boolean wasSet = false;
+  public Person(String aName, String aBio, String aEmail, String aPassword, LocalDate aDate, boolean aIsDeleted) {
     name = aName;
-    wasSet = true;
-    return wasSet;
-  }
-
-  public boolean setBio(String aBio) {
-    boolean wasSet = false;
     bio = aBio;
-    wasSet = true;
-    return wasSet;
-  }
-
-  public boolean setEmail(String aEmail) {
-    boolean wasSet = false;
-    String anOldEmail = getEmail();
-    if (anOldEmail != null && anOldEmail.equals(aEmail)) {
-      return true;
-    }
-    if (hasWithEmail(aEmail)) {
-      return wasSet;
-    }
     email = aEmail;
-    wasSet = true;
-    if (anOldEmail != null) {
-      personsByEmail.remove(anOldEmail);
-    }
-    personsByEmail.put(aEmail, this);
-    return wasSet;
-  }
-
-  public boolean setPassword(String aPassword) {
-    boolean wasSet = false;
     password = aPassword;
-    wasSet = true;
-    return wasSet;
+    creationDate = aDate;
+    isDeleted = aIsDeleted;
   }
 
-  public boolean setCreationDate(LocalDate aCreationDate) {
-    boolean wasSet = false;
+  public void setName(String aName) {
+    name = aName;
+  }
+
+  public void setBio(String aBio) {
+    bio = aBio;
+  }
+
+  public void setEmail(String aEmail) {
+    email = aEmail;
+  }
+
+  public void setPassword(String aPassword) {
+    password = aPassword;
+  }
+
+  public void setCreationDate(LocalDate aCreationDate) {
     creationDate = aCreationDate;
-    wasSet = true;
-    return wasSet;
   }
 
-  public void delete() {
-    isDeleted = true;
-    personsByEmail.remove(getEmail());
+  public void setIsDeleted(boolean aIsDeleted) {
+    isDeleted = aIsDeleted;
   }
 
   public int getId() {
@@ -91,14 +66,6 @@ public class Person {
 
   public String getEmail() {
     return email;
-  }
-
-  public static Person getWithEmail(String aEmail) {
-    return personsByEmail.get(aEmail);
-  }
-
-  public static boolean hasWithEmail(String aEmail) {
-    return getWithEmail(aEmail) != null;
   }
 
   public String getPassword() {

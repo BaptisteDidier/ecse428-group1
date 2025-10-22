@@ -1,48 +1,57 @@
 package com.ecse428.flowfinder.model;
 
+import java.io.Serializable;
+import java.util.Objects;
+
+import jakarta.persistence.*;
+
+@Entity
 public class Registration {
 
-  private Client participant;
-  private SpecificClass danceClass;
+  @EmbeddedId
+	private Key key;
 
-  public Registration(Client aParticipant, SpecificClass aClass) {
-    if (!setParticipant(aParticipant)) {
-      throw new RuntimeException("Unable to create Registration due to aParticipant");
-    }
-    if (!setClass(aClass)) {
-      throw new RuntimeException("Unable to create Registration due to aClass");
-    }
+	protected Registration() {
+	}
+
+	public Registration(Key key) {
+		this.key = key;
+	}
+
+	public Key getKey() {
+		return key;
+	}
+
+  @Embeddable
+	public static class Key implements Serializable {
+
+    @ManyToOne
+    private Client participant;
+    @ManyToOne
+    private SpecificClass danceClass;
+
+    public Key() {
+		}
+
+		public Key(Client participant, SpecificClass danceClass) {
+			this.participant = participant;
+			this.danceClass = danceClass;
+		}
+
+    @Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof Key)) {
+				return false;
+			}
+			Key that = (Key) obj;
+			return this.participant.getId() == that.participant.getId()
+					&& this.danceClass.getId() == that.danceClass.getId();
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(this.participant.getId(), this.danceClass.getId());
+		}
+
   }
-
-  public Client getParticipant() {
-    return participant;
-  }
-
-  public SpecificClass getDanceClass() {
-    return danceClass;
-  }
-
-  public boolean setParticipant(Client aNewParticipant) {
-    boolean wasSet = false;
-    if (aNewParticipant != null) {
-      participant = aNewParticipant;
-      wasSet = true;
-    }
-    return wasSet;
-  }
-
-  public boolean setClass(SpecificClass aNewClass) {
-    boolean wasSet = false;
-    if (aNewClass != null) {
-      danceClass = aNewClass;
-      wasSet = true;
-    }
-    return wasSet;
-  }
-
-  public void delete() {
-    participant = null;
-    danceClass = null;
-  }
-
 }
