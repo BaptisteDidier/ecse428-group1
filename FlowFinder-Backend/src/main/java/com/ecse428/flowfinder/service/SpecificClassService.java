@@ -17,7 +17,8 @@ public class SpecificClassService {
     private SpecificClassRepository specificClassRepository;
 
     // Create or save a SpecificClass
-    public SpecificClass createSpecificClass(boolean aIsDeleted, String aLocation, LocalDate aDate, int aLimit,
+    @Transactional
+    public SpecificClass createSpecificClass(String aLocation, LocalDate aDate, int aLimit,
             LocalTime aStart,
             LocalTime aEnd, DanceClass aClass, Instructor aInstructor) {
         if (aClass == null || aInstructor == null) {
