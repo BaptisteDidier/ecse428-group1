@@ -28,7 +28,11 @@ public class ClientIntegrationTests {
     }
 
     @Test
+<<<<<<< Updated upstream
     public void testRegisterClient_Successful() throws Exception {
+=======
+    public void ST001_01_testRegisterClient_Successful() throws Exception {
+>>>>>>> Stashed changes
         mockMvc.perform(post("/clients")
                 .param("name", "Deniz")
                 .param("bio", "Enjoys hip hop")
@@ -41,7 +45,11 @@ public class ClientIntegrationTests {
     }
 
     @Test
+<<<<<<< Updated upstream
     public void testRegisterClient_DuplicateEmail() throws Exception {
+=======
+    public void ST001_02_testRegisterClient_DuplicateEmail() throws Exception {
+>>>>>>> Stashed changes
         // first create a client
         clientRepository.save(new Client("Alice", "Loves salsa", "alice@email.com", "pass12345", java.time.LocalDate.now(), false));
 
@@ -55,7 +63,11 @@ public class ClientIntegrationTests {
     }
 
     @Test
+<<<<<<< Updated upstream
     public void testRegisterClient_InvalidEmail() throws Exception {
+=======
+    public void ST001_03_testRegisterClient_InvalidEmail() throws Exception {
+>>>>>>> Stashed changes
         mockMvc.perform(post("/clients")
                 .param("name", "Bob")
                 .param("bio", "Loves jazz")
@@ -66,7 +78,11 @@ public class ClientIntegrationTests {
     }
 
     @Test
+<<<<<<< Updated upstream
     public void testRegisterClient_NoBio() throws Exception {
+=======
+    public void ST001_04_testRegisterClient_NoBio() throws Exception {
+>>>>>>> Stashed changes
         mockMvc.perform(post("/clients")
                 .param("name", "Tom")
                 .param("email", "tom@email.com")
