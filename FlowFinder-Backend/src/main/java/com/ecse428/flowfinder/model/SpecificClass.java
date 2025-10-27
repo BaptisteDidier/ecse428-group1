@@ -28,6 +28,7 @@ public class SpecificClass {
     validateLimit(aLimit);
     validateStartAndEndTime(aStart, aEnd);
     validateDateAndTime(aDate, aStart, aEnd);
+    validateLocation(aLocation);
 
     if (aClass == null || aInstructor == null) {
       throw new IllegalArgumentException("DanceClass and Instructor must not be null");
@@ -44,6 +45,7 @@ public class SpecificClass {
   }
 
   public void setLocation(String aLocation) {
+    validateLocation(aLocation);
     location = aLocation;
   }
 
@@ -131,6 +133,10 @@ public class SpecificClass {
     LocalDate today = LocalDate.now();
     LocalTime now = LocalTime.now();
 
+    if (date == null) {
+      throw new IllegalArgumentException("Date cannot be null");
+    }
+
     if (date.isBefore(today)) {
       throw new IllegalArgumentException("Date of class cannot be in the past");
     }
@@ -145,11 +151,21 @@ public class SpecificClass {
   }
 
   public void validateStartAndEndTime(LocalTime start, LocalTime end) {
-    if (end.isBefore(start)) {
-      throw new IllegalArgumentException("End time is before start time");
+    if (start == null || end == null) {
+      throw new IllegalArgumentException("Start and end times cannot be null");
     }
-    if (end.equals(start)) {
-      throw new IllegalArgumentException("End time is equal to start time");
+
+    if (!end.isAfter(start)) {
+      throw new IllegalArgumentException("End time cannot be equal or before start time");
+    }
+  }
+
+  public void validateLocation(String aLocation) {
+    if (aLocation == null) {
+      throw new IllegalArgumentException("Location cannot be null");
+    }
+    if (aLocation.trim().isEmpty()) {
+      throw new IllegalArgumentException("Location cannot be empty");
     }
   }
 
