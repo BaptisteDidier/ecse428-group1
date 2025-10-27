@@ -38,7 +38,7 @@ class DanceClassServiceTests {
     }
 
     @Test
-    void createDanceClass_success_savesAndReturnsEntity() {
+    void US005_01_createDanceClass_success_savesAndReturnsEntity() {
         // Arrange
         boolean isPrivate = false;
         String name = "Beginner Salsa";
@@ -75,7 +75,7 @@ class DanceClassServiceTests {
     }
 
     @Test
-    void createDanceClass_duplicateName_throwsFlowFinderException() {
+    void US005_02_createDanceClass_duplicateName_throwsFlowFinderException() {
         // Arrange: existing class with same name (case-insensitive)
         DanceClass existing = new DanceClass(false, "Beginner Salsa", "Salsa", "Existing");
         when(danceClassRepository.findAll()).thenReturn(List.of(existing));
@@ -93,7 +93,7 @@ class DanceClassServiceTests {
     }
 
     @Test
-    void createDanceClass_blankName_throwsFlowFinderException() {
+    void US005_03_createDanceClass_blankName_throwsFlowFinderException() {
         FlowFinderException ex = assertThrows(
                 FlowFinderException.class,
                 () -> danceClassService.createDanceClass(true, "   ", "HipHop", "Basics")
@@ -104,7 +104,7 @@ class DanceClassServiceTests {
     }
 
     @Test
-    void createDanceClass_nullGenre_throwsFlowFinderException() {
+    void US005_04_createDanceClass_nullGenre_throwsFlowFinderException() {
         FlowFinderException ex = assertThrows(
                 FlowFinderException.class,
                 () -> danceClassService.createDanceClass(false, "Tap 101", null, "Tap intro")
@@ -114,7 +114,7 @@ class DanceClassServiceTests {
     }
 
     @Test
-    void createDanceClass_blankDescription_throwsFlowFinderException() {
+    void US005_05_createDanceClass_blankDescription_throwsFlowFinderException() {
         FlowFinderException ex = assertThrows(
                 FlowFinderException.class,
                 () -> danceClassService.createDanceClass(false, "Ballet 1", "Ballet", "   ")
