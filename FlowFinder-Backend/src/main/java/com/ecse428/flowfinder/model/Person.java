@@ -9,6 +9,10 @@ import jakarta.persistence.*;
 @DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 public abstract class Person {
 
+  public Person() {
+   
+  }
+
   @Id
   @GeneratedValue
   private int id;
