@@ -6,14 +6,29 @@ import java.time.Month;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import static org.mockito.ArgumentMatchers.any;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import org.mockito.MockitoAnnotations;
+
 import com.ecse428.flowfinder.exception.FlowFinderException;
+import com.ecse428.flowfinder.model.SpecificClass;
+import com.ecse428.flowfinder.repository.SpecificClassRepository;
 import com.ecse428.flowfinder.model.DanceClass;
 import com.ecse428.flowfinder.model.Instructor;
-import com.ecse428.flowfinder.model.SpecificClass;
-import com.ecse428.flowfinder.repository.ClientRepository;
-import com.ecse428.flowfinder.repository.DanceClassRepository;
-import com.ecse428.flowfinder.repository.InstructorRepository;
-import com.ecse428.flowfinder.repository.SpecificClassRepository;
 
 public class SpecificClassServiceTests {
 
@@ -21,14 +36,14 @@ public class SpecificClassServiceTests {
     private SpecificClassRepository specificClassRepository;
 
     @InjectMocks
-    private SpecificClassService service;
+    private SpecificClassService specificClassService;
 
     private Instructor instructor;
     private DanceClass danceClass;
-    private SpecificClass specificClass;
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.openMocks(this);
         instructor = new Instructor("instructor1", "bio1", "instructor1@email.com",
                 "password1",
                 LocalDate.of(2024, Month.SEPTEMBER, 18), false);
@@ -39,8 +54,6 @@ public class SpecificClassServiceTests {
 
     @Test
     void testCreateSpecificClass_success() {
-
-        boolean isDeleted = false;
         String location = "Studio A";
         LocalDate classDate = LocalDate.now().plusDays(10);
         int limit = 10;
@@ -53,8 +66,8 @@ public class SpecificClassServiceTests {
         // Mock the repository save method
         when(specificClassRepository.save(any(SpecificClass.class))).thenReturn(savedClass);
 
-        SpecificClass result = specificClassService.createSpecificClass(aLocation,
-                classDate, startTime, endTime, danceClass, instructor);
+        SpecificClass result = specificClassService.createSpecificClass(location,
+                classDate, limit, startTime, endTime, danceClass, instructor);
 
         assertNotNull(result);
         assertEquals(location, result.getLocation());
@@ -69,7 +82,6 @@ public class SpecificClassServiceTests {
 
     @Test
     public void testCreateSpecificClass_NullDanceClass_throwsFlowFinderException() {
-        boolean isDeleted = false;
         String location = "Studio A";
         LocalDate classDate = LocalDate.now().plusDays(10);
         int limit = 10;
@@ -155,7 +167,7 @@ public class SpecificClassServiceTests {
         boolean isDeleted = false;
         String location = "       ";
         LocalDate classDate = LocalDate.now().plusDays(10);
-        int limit = -10;
+        int limit = 10;
         LocalTime startTime = LocalTime.of(10, 0);
         LocalTime endTime = LocalTime.of(11, 0);
 
