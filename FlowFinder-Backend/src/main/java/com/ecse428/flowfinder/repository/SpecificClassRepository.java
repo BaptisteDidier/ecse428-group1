@@ -6,8 +6,19 @@ import com.ecse428.flowfinder.model.DanceClass;
 import com.ecse428.flowfinder.model.Instructor;
 import com.ecse428.flowfinder.model.SpecificClass;
 
+import java.time.LocalDate;
+import java.util.Optional;
+
 public interface SpecificClassRepository extends CrudRepository<SpecificClass, Integer> {
-    SpecificClass findSpecificClassById(int id);
-    Iterable<SpecificClass> findSpecificClassByInstructor(Instructor instructor);
-    Iterable<SpecificClass> findSpecificClassByDanceClass(DanceClass danceClass);
+    Optional<SpecificClass> findById(int id);
+
+    Iterable<SpecificClass> findByInstructor(Instructor instructor);
+
+    Iterable<SpecificClass> findByDanceClass(DanceClass danceClass);
+
+    Iterable<SpecificClass> findByLocation(String location);
+
+    Iterable<SpecificClass> findByDate(LocalDate date);
+
+    Iterable<SpecificClass> findByDateBetween(LocalDate startDate, LocalDate endDate);
 }

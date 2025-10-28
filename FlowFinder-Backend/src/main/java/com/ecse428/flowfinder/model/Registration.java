@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 @Entity
 public class Registration {
 
-  @EmbeddedId
+	@EmbeddedId
 	private Key key;
 
 	protected Registration() {
@@ -22,15 +22,15 @@ public class Registration {
 		return key;
 	}
 
-  @Embeddable
+	@Embeddable
 	public static class Key implements Serializable {
 
-    @ManyToOne
-    private Client participant;
-    @ManyToOne
-    private SpecificClass danceClass;
+		@ManyToOne
+		private Client participant;
+		@ManyToOne
+		private SpecificClass danceClass;
 
-    public Key() {
+		public Key() {
 		}
 
 		public Key(Client participant, SpecificClass danceClass) {
@@ -38,7 +38,15 @@ public class Registration {
 			this.danceClass = danceClass;
 		}
 
-    @Override
+		public SpecificClass getDanceClass() {
+			return danceClass;
+		}
+
+		public Client getParticipant() {
+			return participant;
+		}
+
+		@Override
 		public boolean equals(Object obj) {
 			if (!(obj instanceof Key)) {
 				return false;
@@ -53,5 +61,5 @@ public class Registration {
 			return Objects.hash(this.participant.getId(), this.danceClass.getId());
 		}
 
-  }
+	}
 }
