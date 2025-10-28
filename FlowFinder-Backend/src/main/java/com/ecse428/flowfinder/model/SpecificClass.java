@@ -6,26 +6,20 @@ import java.time.LocalTime;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "specific_class")  // explicit table name
 public class SpecificClass {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // works well with PostgreSQL
+    @GeneratedValue
     private int id;
-
     private boolean isDeleted;
     private String location;
     private LocalDate date;
-    private int limit;
-    private LocalTime start;
-    private LocalTime end;
-
+    private int classLimit;
+    private LocalTime startTime;
+    private LocalTime endTime;
     @ManyToOne
-    @JoinColumn(name = "dance_class_id")  // foreign key column in DB
     private DanceClass danceClass;
-
     @ManyToOne
-    @JoinColumn(name = "instructor_id")  // foreign key column in DB
     private Instructor instructor;
 
     // ---------- Constructors ----------
@@ -37,9 +31,9 @@ public class SpecificClass {
         this.isDeleted = isDeleted;
         this.location = location;
         this.date = date;
-        this.limit = limit;
-        this.start = start;
-        this.end = end;
+        this.classLimit = limit;
+        this.startTime = start;
+        this.endTime = end;
         this.danceClass = danceClass;
         this.instructor = instructor;
     }
@@ -74,28 +68,28 @@ public class SpecificClass {
         this.date = date;
     }
 
-    public int getLimit() {
-        return limit;
+    public int getClassLimit() {
+        return classLimit;
     }
 
-    public void setLimit(int limit) {
-        this.limit = limit;
+    public void setClassLimit(int limit) {
+        this.classLimit = limit;
     }
 
-    public LocalTime getStart() {
-        return start;
+    public LocalTime getStartTime() {
+        return startTime;
     }
 
-    public void setStart(LocalTime start) {
-        this.start = start;
+    public void setStartTime(LocalTime start) {
+        this.startTime = start;
     }
 
-    public LocalTime getEnd() {
-        return end;
+    public LocalTime getEndTime() {
+        return endTime;
     }
 
-    public void setEnd(LocalTime end) {
-        this.end = end;
+    public void setEndTime(LocalTime end) {
+        this.endTime = end;
     }
 
     public DanceClass getDanceClass() {
@@ -122,9 +116,9 @@ public class SpecificClass {
                 ", isDeleted=" + isDeleted +
                 ", location='" + location + '\'' +
                 ", date=" + date +
-                ", limit=" + limit +
-                ", start=" + start +
-                ", end=" + end +
+                ", limit=" + classLimit +
+                ", start=" + startTime +
+                ", end=" + endTime +
                 ", danceClass=" + (danceClass != null ? danceClass.getName() : "null") +
                 ", instructor=" + (instructor != null ? instructor.getName() : "null") +
                 '}';

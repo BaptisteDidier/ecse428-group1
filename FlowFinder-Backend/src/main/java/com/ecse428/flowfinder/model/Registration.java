@@ -22,7 +22,7 @@ public class Registration {
 		return key;
 	}
 
-  @Embeddable
+  	@Embeddable
 	public static class Key implements Serializable {
 
     @ManyToOne

@@ -50,14 +50,14 @@ class InstructorServiceTests {
         instructor.setIsDeleted(false);
 
         sc1 = new SpecificClass();
-        sc1.setStart(LocalTime.of(18, 0));
-        sc1.setEnd(LocalTime.of(19, 0));
+        sc1.setStartTime(LocalTime.of(18, 0));
+        sc1.setEndTime(LocalTime.of(19, 0));
         sc1.setDate(LocalDate.of(2025, 11, 3));
      
 
         sc2 = new SpecificClass();
-        sc2.setStart(LocalTime.of(19, 30));
-        sc2.setEnd(LocalTime.of(20, 30));
+        sc2.setStartTime(LocalTime.of(19, 30));
+        sc2.setEndTime(LocalTime.of(20, 30));
         sc2.setDate(LocalDate.of(2025, 11, 5));
        
     }

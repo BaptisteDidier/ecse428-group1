@@ -13,6 +13,9 @@ public class DanceClass {
   private String genre;
   private String description;
 
+  protected DanceClass() {
+  }
+
   public DanceClass(boolean aIsPrivate, String aName, String aGenre, String aDescription) {
     isPrivate = aIsPrivate;
     name = aName;
