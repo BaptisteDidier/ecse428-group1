@@ -1,12 +1,12 @@
 package com.ecse428.flowfinder.repository;
 
-import com.ecse428.flowfinder.model.Instructor;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+import com.ecse428.flowfinder.model.Instructor;
+
 public interface InstructorRepository extends CrudRepository<Instructor, Integer> {
-  Instructor findByEmail(String email);
-  Instructor findByName(String name);
-  boolean existsByEmail(String email);
-}
+    public Instructor findInstructorById(int id);
+    public boolean existsById(int id);
+    public Instructor findInstructorByEmail(String email);
+    public boolean existsByEmail(String email);
+} 
