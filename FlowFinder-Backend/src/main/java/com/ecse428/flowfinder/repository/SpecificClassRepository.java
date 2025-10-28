@@ -1,5 +1,7 @@
 package com.ecse428.flowfinder.repository;
 
+import java.util.List;
+
 import org.springframework.data.repository.CrudRepository;
 
 import com.ecse428.flowfinder.model.DanceClass;
@@ -10,4 +12,5 @@ public interface SpecificClassRepository extends CrudRepository<SpecificClass, I
     SpecificClass findSpecificClassById(int id);
     Iterable<SpecificClass> findSpecificClassByInstructor(Instructor instructor);
     Iterable<SpecificClass> findSpecificClassByDanceClass(DanceClass danceClass);
+    List<SpecificClass> findByIdIn(List<Long> ids);
 }
