@@ -1,9 +1,15 @@
 package com.ecse428.flowfinder.integration;
 
-public class RegistrationIntegrationTests {
+import org.junit.jupiter.api.BeforeEach;
+import org.springframework.beans.factory.annotation.Autowired;
 
-    @Autowired
-    private MockMvc MockMvc;
+import com.ecse428.flowfinder.repository.ClientRepository;
+import com.ecse428.flowfinder.repository.DanceClassRepository;
+import com.ecse428.flowfinder.repository.InstructorRepository;
+import com.ecse428.flowfinder.repository.RegistrationRepository;
+import com.ecse428.flowfinder.repository.SpecificClassRepository;
+
+public class RegistrationIntegrationTests {
 
     @Autowired
     private RegistrationRepository registrationRepository;
@@ -12,7 +18,7 @@ public class RegistrationIntegrationTests {
     private ClientRepository clientRepository;
 
     @Autowired
-    private InstrusctorRepository instructorRepository;
+    private InstructorRepository instructorRepository;
 
     @Autowired
     private DanceClassRepository danceClassRepository;
