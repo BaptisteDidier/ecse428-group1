@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/dance-classes")
@@ -27,5 +30,12 @@ public class DanceClassController {
             request.getGenre(),
             request.getDescription()
         ));
+    }
+    
+    @GetMapping("/by-genre/{genre}")
+    public List<DanceClassResponse> getDanceClassesByGenre(@PathVariable String genre) {
+        return StreamSupport.stream(danceClassService.getDanceClassesByGenre(genre).spliterator(), false)
+            .map(DanceClassResponse::from)
+            .collect(Collectors.toList());
     }
 } 

@@ -40,4 +40,10 @@ public class DanceClassService {
                 field + " cannot be null or empty");
         }
     }
+    
+    @Transactional
+    public Iterable<DanceClass> getDanceClassesByGenre(String genre) {
+        validate(genre, "Genre");
+        return danceClassRepository.findByGenreIgnoreCase(genre);
+    }
 }
