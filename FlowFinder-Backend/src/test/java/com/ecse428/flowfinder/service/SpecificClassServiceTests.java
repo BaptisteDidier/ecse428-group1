@@ -25,6 +25,12 @@ import com.ecse428.flowfinder.model.Instructor;
 
 public class SpecificClassServiceTests {
 
+    // all tests are not explicitly related to any user story as none of the user
+    // stories relate to Specific Class
+    // However, these tests are indirectly linked to User Story 12 Scenario 1
+    // (Normal flow) as a specific class is
+    // needed to create a successful booking.
+
     @Mock
     private SpecificClassRepository specificClassRepository;
 
