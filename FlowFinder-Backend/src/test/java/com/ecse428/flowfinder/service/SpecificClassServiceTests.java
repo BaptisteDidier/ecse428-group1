@@ -90,7 +90,6 @@ public class SpecificClassServiceTests {
 
     @Test
     public void testCreateSpecificClass_NullInstructor_throwsFlowFinderException() {
-        boolean isDeleted = false;
         String location = "Studio A";
         LocalDate classDate = LocalDate.now().plusDays(10);
         int limit = 10;
@@ -106,7 +105,6 @@ public class SpecificClassServiceTests {
 
     @Test
     void testCreateSpecificClass_NegativeLimit_throwsFlowFinderException() {
-        boolean isDeleted = false;
         String location = "Studio A";
         LocalDate classDate = LocalDate.now().plusDays(10);
         int limit = -10;
@@ -123,7 +121,6 @@ public class SpecificClassServiceTests {
 
     @Test
     void testCreateSpecificClass_PastDate_throwsFlowFinderException() {
-        boolean isDeleted = false;
         String location = "Studio A";
         LocalDate classDate = LocalDate.now().minusDays(10);
         int limit = 10;
@@ -140,7 +137,6 @@ public class SpecificClassServiceTests {
 
     @Test
     void testCreateSpecificClass_PastTime_throwsFlowFinderException() {
-        boolean isDeleted = false;
         String location = "Studio A";
         LocalDate classDate = LocalDate.now();
         int limit = 10;
@@ -157,7 +153,6 @@ public class SpecificClassServiceTests {
 
     @Test
     void testCreateSpecificClass_emptyLocation_throwsFlowFinderException() {
-        boolean isDeleted = false;
         String location = "       ";
         LocalDate classDate = LocalDate.now().plusDays(10);
         int limit = 10;
