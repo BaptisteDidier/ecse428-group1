@@ -13,6 +13,8 @@ import com.ecse428.flowfinder.repository.ClientRepository;
 import com.ecse428.flowfinder.repository.RegistrationRepository;
 import com.ecse428.flowfinder.repository.SpecificClassRepository;
 
+import jakarta.transaction.Transactional;
+
 public class RegistrationService {
 
     @Autowired
@@ -24,22 +26,25 @@ public class RegistrationService {
     @Autowired
     private RegistrationRepository registrationRepository;
 
-    public Registration createRegistration(int clientId, int specificClassId) {
+    @Transactional
+    public Registration createRegistration(Client client, SpecificClass specificClass) {
+        if (client == null) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Client cannot be null");
+        }
+        if (specificClass == null) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Specific Class cannot be null");
+        }
 
-        Client client = clientRepository.findById(clientId)
-                .orElseThrow(
-                        () -> new FlowFinderException(HttpStatus.BAD_REQUEST,
-                                "Client not found with id: " + specificClassId));
+        List<Registration> listOfRegistrationsForSpecificClass = getRegistrationsByClass(specificClass);
+        int numberOfRegistrations = listOfRegistrationsForSpecificClass.size();
+        if (numberOfRegistrations >= specificClass.getLimit()) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "This class is full");
+        }
 
-        SpecificClass danceClass = specificClassRepository.findById(specificClassId)
-                .orElseThrow(
-                        () -> new FlowFinderException(HttpStatus.BAD_REQUEST,
-                                "Class not found with id: " + specificClassId));
-
-        Registration.Key key = new Registration.Key(client, danceClass);
+        Registration.Key key = new Registration.Key(client, specificClass);
 
         if (registrationRepository.existsById(key)) {
-            new FlowFinderException(HttpStatus.BAD_REQUEST, "Client is already registered for this class.");
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Client is already registered for this class");
         }
 
         Registration registration = new Registration(key);
@@ -75,33 +80,32 @@ public class RegistrationService {
     /**
      * Retrieves all registrations for a specific client.
      */
-    public Iterable<Registration> getRegistrationsByClient(int clientId) {
+    public List<Registration> getRegistrationsByClient(int clientId) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(
                         () -> new FlowFinderException(HttpStatus.BAD_REQUEST, "Client not found with id: " + clientId));
 
-        return registrationRepository.findByKey_ParticipantId(clientId);
+        return registrationRepository.findByKey_Participant(client);
     }
 
     /**
      * Retrieves all registrations for a specific dance class.
      */
-    public List<Registration> getRegistrationsByClass(int specificClassId) {
-        SpecificClass danceClass = specificClassRepository.findById(specificClassId)
-                .orElseThrow(
-                        () -> new FlowFinderException(HttpStatus.BAD_REQUEST,
-                                "Class not found with id: " + specificClassId));
+    public List<Registration> getRegistrationsByClass(SpecificClass specificClass) {
+        if (specificClass == null) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "SpecificClass cannot be null");
+        }
 
-        return registrationRepository.findByKey_SpecificClassId(specificClassId);
+        return registrationRepository.findByKey_SpecificClass(specificClass);
     }
 
     /**
      * Checks if a registration exists for the given client and class.
      */
-    public boolean isRegistered(int clientId, int specificClassId) {
-        Client client = clientRepository.findById(clientId)
-                .orElseThrow(
-                        () -> new FlowFinderException(HttpStatus.BAD_REQUEST, "Client not found with id: " + clientId));
+    public boolean isRegistered(Client client, int specificClassId) {
+        if (client == null) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Client cannot be null");
+        }
 
         SpecificClass danceClass = specificClassRepository.findById(specificClassId)
                 .orElseThrow(
