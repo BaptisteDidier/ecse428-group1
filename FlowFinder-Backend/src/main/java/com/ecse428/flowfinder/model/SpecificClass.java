@@ -58,7 +58,7 @@ public class SpecificClass {
   public int getId() {
     return id;
   }
-
+  
   public boolean getIsDeleted() {
     return isDeleted;
   }

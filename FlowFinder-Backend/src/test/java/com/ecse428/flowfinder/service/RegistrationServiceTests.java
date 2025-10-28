@@ -29,6 +29,7 @@ import com.ecse428.flowfinder.model.SpecificClass;
 import com.ecse428.flowfinder.repository.ClientRepository;
 import com.ecse428.flowfinder.repository.RegistrationRepository;
 import com.ecse428.flowfinder.repository.SpecificClassRepository;
+import com.ecse428.flowfinder.service.dto.CancellationOutcome;
 
 public class RegistrationServiceTests {
 
@@ -139,4 +140,61 @@ public class RegistrationServiceTests {
         verify(registrationRepository, times(0)).save(any(Registration.class));
     }
 
+    private SpecificClass sc(LocalDate date, LocalTime start, int limit) {
+        SpecificClass sc = new SpecificClass();
+        sc.setLimit(limit);
+        sc.setDate(date);
+        sc.setStart(start);
+        sc.setEnd(start.plusHours(1));
+        return sc;
+    } 
+    
+    @Test
+    public void cancelRegistration_fullRefund_whenAtLeast24hBefore() {
+        // Class starts 2026-01-10 10:00; now is 2026-01-09 10:00 (exactly 24h)
+        Clock fixed = Clock.fixed(LocalDateTime.of(2026,1,9,10,0).atZone(ZoneId.systemDefault()).toInstant(),
+                                  ZoneId.systemDefault());
+        service = new RegistrationService(fixed, new BigDecimal("9.99"));
+        // wire repos
+        service.clientRepository = clientRepo;
+        service.specificClassRepository = scRepo;
+        service.registrationRepository = regRepo;
+
+        Client c = new Client(); c.setId(1);
+        SpecificClass sc = sc(LocalDate.of(2026,1,10), LocalTime.of(10,0), 12);
+
+        when(clientRepo.findById(1)).thenReturn(Optional.of(c));
+        when(scRepo.findById(7)).thenReturn(Optional.of(sc));
+        when(regRepo.existsById(any(Registration.Key.class))).thenReturn(true);
+
+        CancellationOutcome out = service.cancelRegistration(1, 7);
+
+        assertTrue(out.isFullyRefunded());
+        assertEquals(new BigDecimal("0.00"), out.getFee());
+        verify(regRepo, times(1)).deleteById(any(Registration.Key.class));
+    }
+
+    @Test
+    public void cancelRegistration_lateFee_whenInside24h() {
+        // Now is 2026-01-10 09:30 (30 min before start)
+        Clock fixed = Clock.fixed(LocalDateTime.of(2026,1,10,9,30).atZone(ZoneId.systemDefault()).toInstant(),
+                                  ZoneId.systemDefault());
+        service = new RegistrationService(fixed, new BigDecimal("9.99"));
+        service.clientRepository = clientRepo;
+        service.specificClassRepository = scRepo;
+        service.registrationRepository = regRepo;
+
+        Client c = new Client(); c.setId(1);
+        SpecificClass sc = sc(LocalDate.of(2026,1,10), LocalTime.of(10,0), 12);
+
+        when(clientRepo.findById(1)).thenReturn(Optional.of(c));
+        when(scRepo.findById(7)).thenReturn(Optional.of(sc));
+        when(regRepo.existsById(any(Registration.Key.class))).thenReturn(true);
+
+        CancellationOutcome out = service.cancelRegistration(1, 7);
+
+        assertFalse(out.isFullyRefunded());
+        assertEquals(new BigDecimal("9.99"), out.getFee());
+        verify(regRepo, times(1)).deleteById(any(Registration.Key.class));
+    }
 }

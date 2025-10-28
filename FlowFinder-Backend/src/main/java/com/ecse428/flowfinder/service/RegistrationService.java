@@ -1,9 +1,14 @@
 package com.ecse428.flowfinder.service;
 
 import java.util.List;
+import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
 import com.ecse428.flowfinder.model.Registration;
 import com.ecse428.flowfinder.model.SpecificClass;
@@ -12,6 +17,7 @@ import com.ecse428.flowfinder.model.Client;
 import com.ecse428.flowfinder.repository.ClientRepository;
 import com.ecse428.flowfinder.repository.RegistrationRepository;
 import com.ecse428.flowfinder.repository.SpecificClassRepository;
+import com.ecse428.flowfinder.service.dto.CancellationOutcome;
 
 import jakarta.transaction.Transactional;
 
@@ -25,6 +31,8 @@ public class RegistrationService {
 
     @Autowired
     private RegistrationRepository registrationRepository;
+
+    private final Clock clock;
 
     @Transactional
     public Registration createRegistration(Client client, SpecificClass specificClass) {
@@ -50,7 +58,7 @@ public class RegistrationService {
         Registration registration = new Registration(key);
         return registrationRepository.save(registration);
     }
-
+    
     public void deleteRegistration(int clientId, int specificClassId) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(
@@ -68,6 +76,31 @@ public class RegistrationService {
         }
 
         registrationRepository.deleteById(key);
+    }
+
+    @Transactional
+    public CancellationOutcome cancelRegistration(int clientId, int specificClassId) {
+        Client client = clientRepository.findById(clientId)
+            .orElseThrow(() -> new FlowFinderException(HttpStatus.BAD_REQUEST, "Client not found with id: " + clientId));
+        SpecificClass sc = specificClassRepository.findById(specificClassId)
+            .orElseThrow(() -> new FlowFinderException(HttpStatus.BAD_REQUEST, "Class not found with id: " + specificClassId));
+
+        Registration.Key key = new Registration.Key(client, sc);
+        if (!registrationRepository.existsById(key)) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Registration does not exist.");
+        }
+
+        LocalDateTime start = LocalDateTime.of(sc.getDate(), sc.getStart());
+        LocalDateTime now = LocalDateTime.now(clock);
+
+        boolean early = now.isBefore(start.minusHours(24)) || now.isEqual(start.minusHours(24));
+        BigDecimal fee = early ? BigDecimal.ZERO : lateCancelFee;
+        String msg  = early ? "Cancellation successful: fully refunded."
+                            : "Cancellation successful: late cancellation fee applied.";
+
+        registrationRepository.deleteById(key);
+
+        return new CancellationOutcome(early, fee, msg);
     }
 
     /**
