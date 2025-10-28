@@ -74,7 +74,7 @@ public class InstructorIntegrationTests {
     }
 
     @Test
-    public void ST001_01_testAddNewInstructor_SuccessfulAssignment() throws Exception {
+    public void ST003_01_testAddNewInstructor_SuccessfulAssignment() throws Exception {
         mockMvc.perform(post("/instructors")
                 .param("name", "Emma Lee")
                 .param("bio", "Specialist in Latin")
@@ -89,7 +89,7 @@ public class InstructorIntegrationTests {
     }
 
     @Test
-    public void ST001_02_testAddNewInstructor_FailNoSpecificClassSelected() throws Exception {
+    public void ST003_02_testAddNewInstructor_FailNoSpecificClassSelected() throws Exception {
         mockMvc.perform(post("/instructors")
                 .param("name", "Mark Chen")
                 .param("bio", "Jazz improvisation")
@@ -101,7 +101,7 @@ public class InstructorIntegrationTests {
     }
 
     @Test
-    public void ST001_03_testAddNewInstructor_FailMissingRequiredDetails() throws Exception {
+    public void ST003_03_testAddNewInstructor_FailMissingRequiredDetails() throws Exception {
         mockMvc.perform(post("/instructors")
                 .param("name", "")
                 .param("bio", "Some bio")
@@ -118,7 +118,7 @@ public class InstructorIntegrationTests {
     }
 
     @Test
-    public void ST001_04_testAddNewInstructor_FailDuplicateEmail() throws Exception {
+    public void ST003_04_testAddNewInstructor_FailDuplicateEmail() throws Exception {
         mockMvc.perform(post("/instructors")
                 .param("name", "Sarah 2")
                 .param("bio", "Another Sarah")
@@ -131,7 +131,7 @@ public class InstructorIntegrationTests {
     }
 
     @Test
-    public void ST001_05_testAddNewInstructor_SuccessWithoutBio() throws Exception {
+    public void ST003_05_testAddNewInstructor_SuccessWithoutBio() throws Exception {
         mockMvc.perform(post("/instructors")
                 .param("name", "Sophia Grant")
                 .param("bio", "")
@@ -144,7 +144,7 @@ public class InstructorIntegrationTests {
     }
 
     @Test
-    public void ST001_06_testAddNewInstructor_FailIfIsDeletedTrue() throws Exception {
+    public void ST003_06_testAddNewInstructor_FailIfIsDeletedTrue() throws Exception {
         mockMvc.perform(post("/instructors")
                 .param("name", "Test Deleted")
                 .param("bio", "Any bio")

@@ -63,7 +63,7 @@ class InstructorServiceTests {
     }
 
     @Test
-    void createInstructor_Success() {
+    void ST003_01_createInstructor_Success() {
         CreateInstructorRequest req = new CreateInstructorRequest();
         req.setName("Jane Doe");
         req.setEmail("jane@example.com");
@@ -84,7 +84,7 @@ class InstructorServiceTests {
     }
 
     @Test
-    void createInstructor_DuplicateEmail() {
+    void ST003_04_createInstructor_DuplicateEmail() {
         CreateInstructorRequest req = new CreateInstructorRequest();
         req.setName("Jane Doe");
         req.setEmail("jane@example.com");
@@ -99,7 +99,7 @@ class InstructorServiceTests {
     }
 
     @Test
-    void createInstructor_NoSpecificClasses() {
+    void ST003_02_createInstructor_NoSpecificClasses() {
         CreateInstructorRequest req = new CreateInstructorRequest();
         req.setName("Jane Doe");
         req.setEmail("jane@example.com");
