@@ -6,4 +6,6 @@ import com.ecse428.flowfinder.model.DanceClass;
 
 public interface DanceClassRepository extends CrudRepository<DanceClass, Integer> {
     DanceClass findDanceClassById(int id);
+    
+    Iterable<DanceClass> findByGenreIgnoreCase(String genre);
 }
