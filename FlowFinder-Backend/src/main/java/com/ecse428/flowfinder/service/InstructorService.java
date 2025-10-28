@@ -27,7 +27,12 @@ public class InstructorService {
             throw new IllegalArgumentException("Instructor password cannot be empty");
         }
 
-        // Use the constructor from Instructor/Person
+        // Check if email already exists
+        if (instructorRepo.existsByEmail(email)) {
+            throw new IllegalArgumentException("Email is already in use");
+        }
+
+   
         Instructor instructor = new Instructor(name, bio, email, password, startDate, false);
 
         return instructorRepo.save(instructor);
