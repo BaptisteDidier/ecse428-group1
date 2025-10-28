@@ -17,6 +17,7 @@ public class SpecificClass {
   private int limit;
   private LocalTime start;
   private LocalTime end;
+  private Boolean isCancelled = false;
 
   @ManyToOne
   private DanceClass danceClass;
@@ -58,7 +59,12 @@ public class SpecificClass {
   public int getId() {
     return id;
   }
-
+  public Boolean getIsCancelled() { 
+    return isCancelled; 
+  }
+  public void setIsCancelled(Boolean cancelled) { 
+    this.isCancelled = cancelled; 
+  }
   public boolean getIsDeleted() {
     return isDeleted;
   }
