@@ -6,118 +6,127 @@ import java.time.LocalTime;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "specific_class")  // explicit table name
 public class SpecificClass {
 
-  @Id
-  @GeneratedValue
-  private int id;
-  private boolean isDeleted;
-  private String location;
-  private LocalDate date;
-  private int limit;
-  private LocalTime start;
-  private LocalTime end;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // works well with PostgreSQL
+    private int id;
 
-  @ManyToOne
-  private DanceClass danceClass;
-  @ManyToOne
-  private Instructor instructor;
+    private boolean isDeleted;
+    private String location;
+    private LocalDate date;
+    private int limit;
+    private LocalTime start;
+    private LocalTime end;
 
-  public SpecificClass(boolean aIsDeleted, String aLocation, LocalDate aDate, int aLimit, LocalTime aStart, LocalTime aEnd, DanceClass aClass, Instructor aInstructor) {
-    isDeleted = aIsDeleted;
-    location = aLocation;
-    date = aDate;
-    limit = aLimit;
-    start = aStart;
-    end = aEnd;
-    danceClass = aClass;
-    instructor = aInstructor;
-  }
+    @ManyToOne
+    @JoinColumn(name = "dance_class_id")  // foreign key column in DB
+    private DanceClass danceClass;
 
-  public void setLocation(String aLocation) {
-    location = aLocation;
-  }
+    @ManyToOne
+    @JoinColumn(name = "instructor_id")  // foreign key column in DB
+    private Instructor instructor;
 
-  public void setDate(LocalDate aDate) {
-    date = aDate;
-  }
+    // ---------- Constructors ----------
 
-  public void setLimit(int aLimit) {
-    limit = aLimit;
-  }
-
-  public void setStart(LocalTime aStart) {
-    start = aStart;
-  }
-
-  public void setEnd(LocalTime aEnd) {
-    end = aEnd;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public boolean getIsDeleted() {
-    return isDeleted;
-  }
-
-  public String getLocation() {
-    return location;
-  }
-
-  public LocalDate getDate() {
-    return date;
-  }
-
-  public int getLimit() {
-    return limit;
-  }
-
-  public LocalTime getStart() {
-    return start;
-  }
-
-  public LocalTime getEnd() {
-    return end;
-  }
-
-  public DanceClass getDanceClass() {
-    return danceClass;
-  }
-
-  public Instructor getInstructor() {
-    return instructor;
-  }
-
-  public boolean setDanceClass(DanceClass aNewClass) {
-    boolean wasSet = false;
-    if (aNewClass != null) {
-      danceClass = aNewClass;
-      wasSet = true;
+    public SpecificClass() {
     }
-    return wasSet;
-  }
 
-  public boolean setInstructor(Instructor aNewInstructor) {
-    boolean wasSet = false;
-    if (aNewInstructor != null) {
-      instructor = aNewInstructor;
-      wasSet = true;
+    public SpecificClass(boolean isDeleted, String location, LocalDate date, int limit, LocalTime start, LocalTime end, DanceClass danceClass, Instructor instructor) {
+        this.isDeleted = isDeleted;
+        this.location = location;
+        this.date = date;
+        this.limit = limit;
+        this.start = start;
+        this.end = end;
+        this.danceClass = danceClass;
+        this.instructor = instructor;
     }
-    return wasSet;
-  }
 
-  public String toString() {
-    return super.toString() + "["+
-            "id" + ":" + getId()+ "," +
-            "isDeleted" + ":" + getIsDeleted()+ "," +
-            "location" + ":" + getLocation()+ "," +
-            "limit" + ":" + getLimit()+ "]" + System.getProperties().getProperty("line.separator") +
-            "  " + "date" + "=" + (getDate() != null ? !getDate().equals(this)  ? getDate().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
-            "  " + "start" + "=" + (getStart() != null ? !getStart().equals(this)  ? getStart().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
-            "  " + "end" + "=" + (getEnd() != null ? !getEnd().equals(this)  ? getEnd().toString().replaceAll("  ","    ") : "this" : "null") + System.getProperties().getProperty("line.separator") +
-            "  " + "class = "+(getClass()!=null?Integer.toHexString(System.identityHashCode(getClass())):"null") + System.getProperties().getProperty("line.separator") +
-            "  " + "instructor = "+(getInstructor()!=null?Integer.toHexString(System.identityHashCode(getInstructor())):"null");
-  }
+    // ---------- Getters & Setters ----------
+
+    public int getId() {
+        return id;
+    }
+
+    public boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(boolean isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
+    public void setLimit(int limit) {
+        this.limit = limit;
+    }
+
+    public LocalTime getStart() {
+        return start;
+    }
+
+    public void setStart(LocalTime start) {
+        this.start = start;
+    }
+
+    public LocalTime getEnd() {
+        return end;
+    }
+
+    public void setEnd(LocalTime end) {
+        this.end = end;
+    }
+
+    public DanceClass getDanceClass() {
+        return danceClass;
+    }
+
+    public void setDanceClass(DanceClass danceClass) {
+        this.danceClass = danceClass;
+    }
+
+    public Instructor getInstructor() {
+        return instructor;
+    }
+
+    public void setInstructor(Instructor instructor) {
+        this.instructor = instructor;
+    }
+
+    // ---------- toString ----------
+    @Override
+    public String toString() {
+        return "SpecificClass{" +
+                "id=" + id +
+                ", isDeleted=" + isDeleted +
+                ", location='" + location + '\'' +
+                ", date=" + date +
+                ", limit=" + limit +
+                ", start=" + start +
+                ", end=" + end +
+                ", danceClass=" + (danceClass != null ? danceClass.getName() : "null") +
+                ", instructor=" + (instructor != null ? instructor.getName() : "null") +
+                '}';
+    }
 }
