@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+logfile
+
+### Mac ###
+.DS_Store
+.AppleDouble
+.LSOverride
+**/.DS_Store

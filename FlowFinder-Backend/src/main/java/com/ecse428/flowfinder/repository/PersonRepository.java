@@ -10,3 +10,4 @@ public interface PersonRepository extends CrudRepository<Person, Integer> {
     public Person findPersonByEmail(String email);
     public boolean existsByEmail(String email);
 }
+
