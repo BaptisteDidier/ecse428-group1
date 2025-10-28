@@ -48,8 +48,6 @@ public class RegistrationServiceTests {
     private Instructor instructor;
     private DanceClass danceClass;
     private SpecificClass specificClass;
-    private Registration.Key key;
-    private Registration registration;
 
     @BeforeEach
     public void setUp() {
@@ -129,8 +127,6 @@ public class RegistrationServiceTests {
     @Test
     public void US012_05_testCreateRegistration_ClassFull_throwsFlowFinderException() {
         specificClass.setLimit(1);
-        Registration.Key key = new Key(client, specificClass);
-        Registration savedRegistration = new Registration(key);
 
         when(registrationRepository.findByKey_SpecificClass(specificClass))
                 .thenReturn(List.of(new Registration(new Registration.Key(client, specificClass))));
