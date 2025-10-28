@@ -21,8 +21,7 @@ public class ClientService {
 
     private final static LocalDate today = LocalDate.now();
     private final static String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-    private final static Client deletedClient = new Client("Deleted User", null, null, null, LocalDate.of(1970, 1, 1), true);
-    
+        
     @Transactional
     public Client createClient(String name, String bio, String email, String password) {
         validate(name, "Name");
