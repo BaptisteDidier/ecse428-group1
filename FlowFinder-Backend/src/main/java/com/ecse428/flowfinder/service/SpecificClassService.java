@@ -58,7 +58,7 @@ public class SpecificClassService {
         if (instructor == null) {
             throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Instructor cannot be null");
         }
-        return specificClassRepository.findByInstructor(instructor);
+        return specificClassRepository.findSpecificClassByInstructor(instructor);
     }
 
     // Find all by DanceClass
@@ -66,7 +66,7 @@ public class SpecificClassService {
         if (danceClass == null) {
             throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Dance class cannot be null");
         }
-        return specificClassRepository.findByDanceClass(danceClass);
+        return specificClassRepository.findSpecificClassByDanceClass(danceClass);
     }
 
     // Find all by Location
@@ -74,7 +74,7 @@ public class SpecificClassService {
         if (location == null || location.trim().isEmpty()) {
             throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Location cannot be null or empty");
         }
-        return specificClassRepository.findByLocation(location);
+        return specificClassRepository.findSpecificClassByLocation(location);
     }
 
     // Find all by Date
@@ -82,7 +82,7 @@ public class SpecificClassService {
         if (date == null) {
             throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Date cannot be null");
         }
-        return specificClassRepository.findByDate(date);
+        return specificClassRepository.findSpecificClassByDate(date);
     }
 
     // Find all between Dates
@@ -93,7 +93,7 @@ public class SpecificClassService {
         if (endDate.isBefore(startDate)) {
             throw new FlowFinderException(HttpStatus.BAD_REQUEST, "End date cannot be before start date");
         }
-        return specificClassRepository.findByDateBetween(startDate, endDate);
+        return specificClassRepository.findSpecificClassByDateBetween(startDate, endDate);
     }
 
     // Delete by ID

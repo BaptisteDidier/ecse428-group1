@@ -8,6 +8,10 @@ import com.ecse428.flowfinder.model.SpecificClass;
 import com.ecse428.flowfinder.repository.InstructorRepository;
 import com.ecse428.flowfinder.repository.PersonRepository;
 import com.ecse428.flowfinder.repository.SpecificClassRepository;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +21,14 @@ import java.util.List;
 @Service
 public class InstructorService {
 
-    private final InstructorRepository instructorRepo;
-    private final PersonRepository personRepo;
-    private final SpecificClassRepository specificClassRepo;
+    @Autowired
+    private InstructorRepository instructorRepo;
+    @Autowired
+    private PersonRepository personRepo;
+    @Autowired
+    private SpecificClassRepository specificClassRepo;
 
-    public InstructorService(InstructorRepository instructorRepo,
-                             PersonRepository personRepo,
-                             SpecificClassRepository specificClassRepo) {
-        this.instructorRepo = instructorRepo;
-        this.personRepo = personRepo;
-        this.specificClassRepo = specificClassRepo;
-    }
-
+    @Transactional
     public InstructorResponse createInstructor(CreateInstructorRequest req) {
         // Uniqueness across Person table (single-table inheritance)
         // Prefer a case-insensitive exists method. If you only have existsByEmail(...),

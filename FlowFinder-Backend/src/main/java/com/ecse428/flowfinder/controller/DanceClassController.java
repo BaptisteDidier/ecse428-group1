@@ -3,6 +3,8 @@ package com.ecse428.flowfinder.controller;
 import com.ecse428.flowfinder.dto.CreateDanceClassRequest;
 import com.ecse428.flowfinder.dto.DanceClassResponse;
 import com.ecse428.flowfinder.service.DanceClassService;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,13 +15,11 @@ import java.util.stream.StreamSupport;
 
 @RestController
 @RequestMapping("/dance-classes")
+@CrossOrigin(origins = "*")
 public class DanceClassController {
     
-    private final DanceClassService danceClassService;
-
-    public DanceClassController(DanceClassService danceClassService) {
-        this.danceClassService = danceClassService;
-    }
+    @Autowired
+    private DanceClassService danceClassService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

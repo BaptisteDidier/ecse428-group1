@@ -9,7 +9,6 @@ import com.ecse428.flowfinder.model.Instructor;
 import com.ecse428.flowfinder.model.SpecificClass;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 public interface SpecificClassRepository extends CrudRepository<SpecificClass, Integer> {
     SpecificClass findSpecificClassById(int id);

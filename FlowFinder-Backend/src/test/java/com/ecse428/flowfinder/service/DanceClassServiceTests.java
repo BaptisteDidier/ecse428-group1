@@ -1,7 +1,6 @@
 package com.ecse428.flowfinder.service;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
@@ -28,7 +27,7 @@ public class DanceClassServiceTests {
     private DanceClassService danceClassService;
 
     @Test
-    public void testGetDanceClassesByGenre_Success() {
+    public void ST012_01_testGetDanceClassesByGenre_Success() {
         // Prepare test data
         DanceClass ballet1 = new DanceClass(false, "Ballet Class 1", "Ballet", "Basic ballet class");
         DanceClass ballet2 = new DanceClass(false, "Ballet Class 2", "Ballet", "Advanced ballet class");
@@ -47,7 +46,7 @@ public class DanceClassServiceTests {
     }
 
     @Test
-    public void testGetDanceClassesByGenre_EmptyResult() {
+    public void ST012_01_testGetDanceClassesByGenre_EmptyResult() {
         // Mock repository response for non-existing genre
         when(danceClassRepository.findByGenreIgnoreCase("NonExisting"))
             .thenReturn(Collections.emptyList());
@@ -62,7 +61,7 @@ public class DanceClassServiceTests {
     }
 
     @Test
-    public void testGetDanceClassesByGenre_NullGenre() {
+    public void ST012_01_testGetDanceClassesByGenre_NullGenre() {
         // Test with null genre
         FlowFinderException exception = assertThrows(FlowFinderException.class,
                 () -> danceClassService.getDanceClassesByGenre(null),
@@ -73,7 +72,7 @@ public class DanceClassServiceTests {
     }
 
     @Test
-    public void testGetDanceClassesByGenre_EmptyGenre() {
+    public void ST012_01_testGetDanceClassesByGenre_EmptyGenre() {
         // Test with empty genre
         FlowFinderException exception = assertThrows(FlowFinderException.class,
                 () -> danceClassService.getDanceClassesByGenre("  "),

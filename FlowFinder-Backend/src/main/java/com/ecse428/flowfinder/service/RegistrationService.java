@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 
 import com.ecse428.flowfinder.model.Registration;
 import com.ecse428.flowfinder.model.SpecificClass;
@@ -15,6 +16,7 @@ import com.ecse428.flowfinder.repository.SpecificClassRepository;
 
 import jakarta.transaction.Transactional;
 
+@Service
 public class RegistrationService {
 
     @Autowired
@@ -96,7 +98,7 @@ public class RegistrationService {
             throw new FlowFinderException(HttpStatus.BAD_REQUEST, "SpecificClass cannot be null");
         }
 
-        return registrationRepository.findByKey_SpecificClass(specificClass);
+        return registrationRepository.findByKey_DanceClass(specificClass);
     }
 
     /**

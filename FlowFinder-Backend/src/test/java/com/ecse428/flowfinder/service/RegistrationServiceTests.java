@@ -128,7 +128,7 @@ public class RegistrationServiceTests {
     public void US012_05_testCreateRegistration_ClassFull_throwsFlowFinderException() {
         specificClass.setLimit(1);
 
-        when(registrationRepository.findByKey_SpecificClass(specificClass))
+        when(registrationRepository.findByKey_DanceClass(specificClass))
                 .thenReturn(List.of(new Registration(new Registration.Key(client, specificClass))));
 
         FlowFinderException exception = assertThrows(FlowFinderException.class, () -> {
