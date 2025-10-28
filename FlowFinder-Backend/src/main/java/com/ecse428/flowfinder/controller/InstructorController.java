@@ -19,7 +19,7 @@ public class InstructorController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public InstructorResponse create(@Valid @RequestBody CreateInstructorRequest req) {
+    public InstructorResponse registerInstructor(@Valid @RequestBody CreateInstructorRequest req) {
         return instructorService.createInstructor(req);
     }
 }
