@@ -6,10 +6,11 @@ import java.time.LocalTime;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "specific_class")
 public class SpecificClass {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
   private boolean isDeleted;
   private String location;
@@ -22,6 +23,8 @@ public class SpecificClass {
   private DanceClass danceClass;
   @ManyToOne
   private Instructor instructor;
+
+  public SpecificClass() {}
 
   public SpecificClass(boolean aIsDeleted, String aLocation, LocalDate aDate, int aLimit, LocalTime aStart,
       LocalTime aEnd, DanceClass aClass, Instructor aInstructor) {
