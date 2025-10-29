@@ -24,7 +24,7 @@ public class DanceClassRepositoryTests {
     }
 
     @Test
-    public void testFindByGenreIgnoreCase_ExactMatch() {
+    public void ST012_01_testFindByGenreIgnoreCase_ExactMatch() {
         // Create test dance classes
         DanceClass ballet1 = new DanceClass(false, "Ballet Class 1", "Ballet", "Basic ballet class");
         DanceClass ballet2 = new DanceClass(false, "Ballet Class 2", "Ballet", "Advanced ballet class");
@@ -46,7 +46,7 @@ public class DanceClassRepositoryTests {
     }
 
     @Test
-    public void testFindByGenreIgnoreCase_CaseInsensitive() {
+    public void ST012_01_testFindByGenreIgnoreCase_CaseInsensitive() {
         // Create test dance class
         DanceClass ballet = new DanceClass(false, "Ballet Class", "Ballet", "Basic ballet class");
         danceClassRepository.save(ballet);
@@ -67,7 +67,7 @@ public class DanceClassRepositoryTests {
     }
 
     @Test
-    public void testFindByGenreIgnoreCase_NoMatch() {
+    public void ST012_01_testFindByGenreIgnoreCase_NoMatch() {
         // Create test dance class
         DanceClass ballet = new DanceClass(false, "Ballet Class", "Ballet", "Basic ballet class");
         danceClassRepository.save(ballet);

@@ -52,7 +52,7 @@ public class SpecificClassServiceTests {
     }
 
     @Test
-    void testCreateSpecificClass_success() {
+    void ST012_01_testCreateSpecificClass_success() {
         String location = "Studio A";
         LocalDate classDate = LocalDate.now().plusDays(10);
         int limit = 10;
@@ -80,7 +80,7 @@ public class SpecificClassServiceTests {
     }
 
     @Test
-    public void testCreateSpecificClass_NullDanceClass_throwsFlowFinderException() {
+    public void ST012_03_testCreateSpecificClass_NullDanceClass_throwsFlowFinderException() {
         String location = "Studio A";
         LocalDate classDate = LocalDate.now().plusDays(10);
         int limit = 10;
@@ -95,7 +95,7 @@ public class SpecificClassServiceTests {
     }
 
     @Test
-    public void testCreateSpecificClass_NullInstructor_throwsFlowFinderException() {
+    public void ST012_03_testCreateSpecificClass_NullInstructor_throwsFlowFinderException() {
         String location = "Studio A";
         LocalDate classDate = LocalDate.now().plusDays(10);
         int limit = 10;
@@ -110,7 +110,7 @@ public class SpecificClassServiceTests {
     }
 
     @Test
-    void testCreateSpecificClass_NegativeLimit_throwsFlowFinderException() {
+    void ST012_05_testCreateSpecificClass_NegativeLimit_throwsFlowFinderException() {
         String location = "Studio A";
         LocalDate classDate = LocalDate.now().plusDays(10);
         int limit = -10;
@@ -126,7 +126,7 @@ public class SpecificClassServiceTests {
     }
 
     @Test
-    void testCreateSpecificClass_PastDate_throwsFlowFinderException() {
+    void ST012_01_testCreateSpecificClass_PastDate_throwsFlowFinderException() {
         String location = "Studio A";
         LocalDate classDate = LocalDate.now().minusDays(10);
         int limit = 10;
@@ -142,7 +142,7 @@ public class SpecificClassServiceTests {
     }
 
     @Test
-    void testCreateSpecificClass_PastTime_throwsFlowFinderException() {
+    void ST012_01_testCreateSpecificClass_PastTime_throwsFlowFinderException() {
         String location = "Studio A";
         LocalDate classDate = LocalDate.now();
         int limit = 10;
@@ -158,7 +158,7 @@ public class SpecificClassServiceTests {
     }
 
     @Test
-    void testCreateSpecificClass_emptyLocation_throwsFlowFinderException() {
+    void ST012_01_testCreateSpecificClass_emptyLocation_throwsFlowFinderException() {
         String location = "       ";
         LocalDate classDate = LocalDate.now().plusDays(10);
         int limit = 10;
