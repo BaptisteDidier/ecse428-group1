@@ -12,6 +12,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import java.util.Optional;
+
 
 import java.time.LocalDate;
 
@@ -111,4 +113,33 @@ public class ClientServiceTests {
         verify(clientRepository, times(1)).save(client);
     }
     
+    @Test
+public void US001_05_testGetClientById_Success() {
+    
+    Client mockClient = new Client(validName, validBio, validEmail, validPassword, validDate, false);
+    
+    when(clientRepository.findById(1)).thenReturn(Optional.of(mockClient));
+
+    Client client = clientService.getClientById(1);
+
+    assertNotNull(client);
+    assertEquals(validName, client.getName());
+    assertEquals(validBio, client.getBio());
+    assertEquals(validEmail, client.getEmail());
+
+    verify(clientRepository, times(1)).findById(1);
+}
+
+@Test
+public void US001_06_testGetClientById_NotFound() {
+    when(clientRepository.findById(999)).thenReturn(Optional.empty());
+
+    FlowFinderException exception = assertThrows(FlowFinderException.class,
+            () -> clientService.getClientById(999));
+
+    assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+    assertEquals("No client found with ID 999", exception.getMessage());
+
+    verify(clientRepository, times(1)).findById(999);
+}
 }
