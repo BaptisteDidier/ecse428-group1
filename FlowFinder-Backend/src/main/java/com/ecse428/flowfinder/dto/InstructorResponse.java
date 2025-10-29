@@ -2,10 +2,11 @@ package com.ecse428.flowfinder.dto;
 
 import com.ecse428.flowfinder.model.Instructor;
 import com.ecse428.flowfinder.model.SpecificClass;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.LocalDate;
 import java.util.List;
-
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class InstructorResponse {
     private int id;
     private String name;

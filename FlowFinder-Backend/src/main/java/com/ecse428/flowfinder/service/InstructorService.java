@@ -33,11 +33,15 @@ public class InstructorService {
         // Uniqueness across Person table (single-table inheritance)
         // Prefer a case-insensitive exists method. If you only have existsByEmail(...),
         // keep it but consider adding existsByEmailIgnoreCase(...) in PersonRepository.
-        boolean emailInUse = personRepo.existsByEmail(req.getEmail()) || personRepo.existsByEmail(req.getEmail());
+        boolean emailInUse = personRepo.existsByEmail(req.getEmail());
 
         if (emailInUse) {
             throw new FlowFinderException(HttpStatus.CONFLICT, "Email already in use by another person");
         }
+
+        if (Boolean.TRUE.equals(req.getIsDeleted())) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "New instructors must not be created as deleted");
+        }        
 
         if (req.getSpecificClassIds() == null || req.getSpecificClassIds().isEmpty()) {
             throw new FlowFinderException(HttpStatus.BAD_REQUEST,
