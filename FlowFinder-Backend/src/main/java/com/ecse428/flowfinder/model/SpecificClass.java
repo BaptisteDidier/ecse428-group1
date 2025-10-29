@@ -15,9 +15,9 @@ public class SpecificClass {
   private boolean isDeleted;
   private String location;
   private LocalDate date;
-  private int limit;
-  private LocalTime start;
-  private LocalTime end;
+  private int classLimit;
+  private LocalTime startTime;
+  private LocalTime endTime;
 
   @ManyToOne
   private DanceClass danceClass;
@@ -31,9 +31,9 @@ public class SpecificClass {
     isDeleted = aIsDeleted;
     location = aLocation;
     date = aDate;
-    limit = aLimit;
-    start = aStart;
-    end = aEnd;
+    classLimit = aLimit;
+    startTime = aStart;
+    endTime = aEnd;
     danceClass = aClass;
     instructor = aInstructor;
   }
@@ -46,16 +46,16 @@ public class SpecificClass {
     date = aDate;
   }
 
-  public void setLimit(int aLimit) {
-    limit = aLimit;
+  public void setClassLimit(int aLimit) {
+    classLimit = aLimit;
   }
 
-  public void setStart(LocalTime aStart) {
-    start = aStart;
+  public void setStartTime(LocalTime aStart) {
+    startTime = aStart;
   }
 
-  public void setEnd(LocalTime aEnd) {
-    end = aEnd;
+  public void setEndTime(LocalTime aEnd) {
+    endTime = aEnd;
   }
 
   public int getId() {
@@ -74,16 +74,16 @@ public class SpecificClass {
     return date;
   }
 
-  public int getLimit() {
-    return limit;
+  public int getClassLimit() {
+    return classLimit;
   }
 
   public LocalTime getStart() {
-    return start;
+    return startTime;
   }
 
   public LocalTime getEnd() {
-    return end;
+    return endTime;
   }
 
   public DanceClass getDanceClass() {
@@ -117,7 +117,7 @@ public class SpecificClass {
         "id" + ":" + getId() + "," +
         "isDeleted" + ":" + getIsDeleted() + "," +
         "location" + ":" + getLocation() + "," +
-        "limit" + ":" + getLimit() + "]" + System.getProperties().getProperty("line.separator") +
+        "limit" + ":" + getClassLimit() + "]" + System.getProperties().getProperty("line.separator") +
         "  " + "date" + "="
         + (getDate() != null ? !getDate().equals(this) ? getDate().toString().replaceAll("  ", "    ") : "this"
             : "null")

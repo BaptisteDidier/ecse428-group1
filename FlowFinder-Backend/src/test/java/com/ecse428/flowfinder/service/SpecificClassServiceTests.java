@@ -71,7 +71,7 @@ public class SpecificClassServiceTests {
         assertNotNull(result);
         assertEquals(location, result.getLocation());
         assertEquals(classDate, result.getDate());
-        assertEquals(limit, result.getLimit());
+        assertEquals(limit, result.getClassLimit());
         assertEquals(startTime, result.getStart());
         assertEquals(endTime, result.getEnd());
         assertEquals(danceClass, result.getDanceClass());
