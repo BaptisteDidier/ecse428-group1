@@ -120,7 +120,7 @@ public class RegistrationIntegrationTests {
         Client client = clientRepository.save(new Client("client1", "Bio1", "client1@email.com", "pass1234", LocalDate.now(), false));
         Instructor instructor = instructorRepository.save(new Instructor("instructor1", "BioI", "instructor1@email.com", "pass1234", LocalDate.now(), false));
         DanceClass danceClass = danceClassRepository.save(new DanceClass(false, "danceClassName1", "danceGenre1", "desc"));
-        SpecificClass specificClass = specificClassRepository.save(new SpecificClass(false, "Studio A", LocalDate.now().plusDays(1), 12, LocalTime.of(10, 0), LocalTime.of(11, 0), danceClass, instructor));
+        SpecificClass specificClass = specificClassRepository.save(new SpecificClass(false, "Studio A", LocalDate.now().plusDays(1), 1, LocalTime.of(10, 0), LocalTime.of(11, 0), danceClass, instructor));
 
         Client client2 = clientRepository.save(new Client("client2", "Bio2", "client2@email.com", "pass1234", LocalDate.now(), false));
         mockMvc.perform(post("/registrations")

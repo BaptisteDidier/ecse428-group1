@@ -2,6 +2,7 @@ package com.ecse428.flowfinder.service;
 
 import java.time.LocalDate;
 import java.util.regex.Pattern;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,15 @@ public class ClientService {
 
         client = new Client(name, bio, email, password, today, false);
         return clientRepository.save(client);
+    }
+
+    @Transactional
+    public Client getClientById(Integer id) {
+        Optional<Client> result = clientRepository.findById(id);
+        if (result.isEmpty()) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "No client found with ID " + id);
+        }
+        return result.get();
     }
 
 

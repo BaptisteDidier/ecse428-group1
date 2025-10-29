@@ -21,21 +21,52 @@ public class RegistrationController {
     @Autowired
     private RegistrationService registrationService;
 
+    @Autowired
+    private ClientService clientService;
+
+    @Autowired
+    private SpecificClassService specificClassService;
+
     @PostMapping
-    public ResponseEntity<Registration> createRegistration(
-            @RequestParam Client client,
-            @RequestParam SpecificClass specificClass
+    public ResponseEntity<?> createRegistration(
+        @RequestParam(required = false) Integer clientId,
+        @RequestParam(required = false) Integer specificClassId
     ) {
-        Registration registration = registrationService.createRegistration(client, specificClass);
-        return new ResponseEntity<>(registration, HttpStatus.CREATED);
+        try {
+            if (clientId == null) {
+                return new ResponseEntity<>("Client cannot be null", HttpStatus.BAD_REQUEST);
+            }
+            if (specificClassId == null) {
+                return new ResponseEntity<>("Specific Class cannot be null", HttpStatus.BAD_REQUEST);
+            }
+
+            Client client = clientService.getClientById(clientId);
+            SpecificClass specificClass = specificClassService.getSpecificClassById(specificClassId);
+
+            Registration registration = registrationService.createRegistration(client, specificClass);
+            return new ResponseEntity<>(registration, HttpStatus.CREATED);
+
+        } catch (FlowFinderException e) {
+            return new ResponseEntity<>(e.getMessage(), e.getStatus());
+        }
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteRegistration(
+    public ResponseEntity<?> deleteRegistration(
             @RequestParam int clientId,
             @RequestParam int specificClassId
     ) {
-        registrationService.deleteRegistration(clientId, specificClassId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        try {
+            registrationService.deleteRegistration(clientId, specificClassId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (FlowFinderException e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred");
+        }
     }
 }
