@@ -17,9 +17,15 @@ public class DanceClassRepositoryTests {
 
     @Autowired
     private DanceClassRepository danceClassRepository;
+    @Autowired
+    private SpecificClassRepository specificClassRepository;
+    @Autowired
+    private RegistrationRepository registrationRepository;
 
     @AfterEach
     public void clearDatabase() {
+        registrationRepository.deleteAll();
+        specificClassRepository.deleteAll();
         danceClassRepository.deleteAll();
     }
 

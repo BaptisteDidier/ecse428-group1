@@ -138,7 +138,7 @@ public class SpecificClassService {
         }
 
         if (!end.isAfter(start)) {
-            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "End time cannot be equal or before start time");
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Class start and end time must be after current time");
         }
     }
 
