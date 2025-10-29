@@ -39,7 +39,7 @@ public class RegistrationService {
 
         List<Registration> listOfRegistrationsForSpecificClass = getRegistrationsByClass(specificClass);
         int numberOfRegistrations = listOfRegistrationsForSpecificClass.size();
-        if (numberOfRegistrations >= specificClass.getLimit()) {
+        if (numberOfRegistrations >= specificClass.getClassLimit()) {
             throw new FlowFinderException(HttpStatus.BAD_REQUEST, "This class is full");
         }
 

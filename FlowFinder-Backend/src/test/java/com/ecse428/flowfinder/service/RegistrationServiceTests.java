@@ -126,7 +126,7 @@ public class RegistrationServiceTests {
 
     @Test
     public void US012_05_testCreateRegistration_ClassFull_throwsFlowFinderException() {
-        specificClass.setLimit(1);
+        specificClass.setClassLimit(1);
 
         when(registrationRepository.findByKey_DanceClass(specificClass))
                 .thenReturn(List.of(new Registration(new Registration.Key(client, specificClass))));
