@@ -6,12 +6,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.ecse428.flowfinder.dto.ErrorDto;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class FlowFinderExceptionHandler {
     @ExceptionHandler(FlowFinderException.class)
     public ResponseEntity<ErrorDto> handleGameShopException(FlowFinderException e) {

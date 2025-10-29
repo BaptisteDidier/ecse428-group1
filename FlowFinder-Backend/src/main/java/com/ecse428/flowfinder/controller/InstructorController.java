@@ -1,5 +1,6 @@
 package com.ecse428.flowfinder.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import com.ecse428.flowfinder.dto.CreateInstructorRequest;
 import com.ecse428.flowfinder.dto.InstructorResponse;
 import com.ecse428.flowfinder.service.InstructorService;
@@ -20,7 +21,7 @@ public class InstructorController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public InstructorResponse create(@Valid @RequestBody CreateInstructorRequest req) {
+    public InstructorResponse registerInstructor(@Valid @RequestBody CreateInstructorRequest req) {
         return instructorService.createInstructor(req);
     }
 }
