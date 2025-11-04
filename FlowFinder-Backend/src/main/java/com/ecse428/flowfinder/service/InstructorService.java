@@ -8,7 +8,7 @@ import com.ecse428.flowfinder.model.SpecificClass;
 import com.ecse428.flowfinder.repository.InstructorRepository;
 import com.ecse428.flowfinder.repository.PersonRepository;
 import com.ecse428.flowfinder.repository.SpecificClassRepository;
-
+import java.util.regex.Pattern;
 import jakarta.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,20 @@ public class InstructorService {
         // Prefer a case-insensitive exists method. If you only have existsByEmail(...),
         // keep it but consider adding existsByEmailIgnoreCase(...) in PersonRepository.
         boolean emailInUse = personRepo.existsByEmail(req.getEmail());
+        Pattern VALID_EMAIL_ADDRESS_REGEX =
+                Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
+        if (req.getName() == null || req.getName().trim().isEmpty()) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Name is required");
+        }
+
+        if (req.getPassword() == null || req.getPassword().isEmpty()) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Password is required");
+        }
+
+        if (req.getEmail() == null || !VALID_EMAIL_ADDRESS_REGEX.matcher(req.getEmail()).matches()) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Enter a valid email address");
+        }
 
         if (emailInUse) {
             throw new FlowFinderException(HttpStatus.CONFLICT, "Email already in use by another person");
@@ -41,7 +55,7 @@ public class InstructorService {
 
         if (Boolean.TRUE.equals(req.getIsDeleted())) {
             throw new FlowFinderException(HttpStatus.BAD_REQUEST, "New instructors must not be created as deleted");
-        }        
+        }
 
         if (req.getSpecificClassIds() == null || req.getSpecificClassIds().isEmpty()) {
             throw new FlowFinderException(HttpStatus.BAD_REQUEST,

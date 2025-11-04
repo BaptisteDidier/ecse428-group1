@@ -63,6 +63,62 @@ class InstructorServiceTests {
     }
 
     @Test
+    void ST003_03_createInstructor_MissingName() {
+        CreateInstructorRequest req = new CreateInstructorRequest();
+        req.setName(null); // Missing Name (or use "  " for empty string)
+        req.setEmail("valid@email.com"); // Valid
+        req.setPassword("pass123");      // Valid
+        req.setSpecificClassIds(List.of(1L)); // Valid
+
+        // Act & Assert
+        FlowFinderException ex = assertThrows(FlowFinderException.class,
+                () -> instructorService.createInstructor(req));
+
+        // Assert: Throws the specific error message for Name
+        assertEquals("Name is required", ex.getMessage());
+
+    }
+
+    // --- NEW TEST: ST003 Validation - Missing Password ---
+    @Test
+    void ST003_03_createInstructor_MissingPassword() {
+        CreateInstructorRequest req = new CreateInstructorRequest();
+        req.setName("Valid Name");      // Valid
+        req.setEmail("valid2@email.com"); // Valid
+        req.setPassword("");            // Missing Password (Empty string)
+        req.setSpecificClassIds(List.of(1L)); // Valid
+
+        // Act & Assert
+        FlowFinderException ex = assertThrows(FlowFinderException.class,
+                () -> instructorService.createInstructor(req));
+
+        // Assert: Throws the specific error message for Password
+        assertEquals("Password is required", ex.getMessage());
+    }
+
+    @Test
+    void ST003_03_createInstructor_InvalidEmailFormat() {
+        CreateInstructorRequest req = new CreateInstructorRequest();
+        req.setName("Valid Name");      // Valid
+        req.setEmail("invalid-email");  // Invalid Email (Missing @ and domain)
+        req.setPassword("pass123");     // Valid
+        req.setSpecificClassIds(List.of(1L)); // Valid
+
+        // Arrange: Mock the existence check, though the validation should stop before it runs
+        when(personRepo.existsByEmail("invalid-email")).thenReturn(false);
+
+        // Act & Assert
+        FlowFinderException ex = assertThrows(FlowFinderException.class,
+                () -> instructorService.createInstructor(req));
+
+        // Assert
+        assertEquals("Enter a valid email address", ex.getMessage());
+
+        // Verify: No persistence occurred
+        verify(instructorRepo, never()).save(any());
+    }
+
+    @Test
     void ST003_01_createInstructor_Success() {
         CreateInstructorRequest req = new CreateInstructorRequest();
         req.setName("Jane Doe");
