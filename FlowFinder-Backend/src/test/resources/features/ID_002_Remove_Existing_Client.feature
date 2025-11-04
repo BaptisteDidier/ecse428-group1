@@ -1,7 +1,7 @@
-Feature: Remove an existing client
-  As an instructor
-  I want to remove a client from the system
-  So that they no longer have access to classes or the platform
+Feature: Remove my client account
+  As an existing client
+  I want to delete my own account from the FlowFinder system
+  So that I no longer have access to classes or the platform
 
   Background:
     Given the FlowFinder system is running
@@ -12,21 +12,22 @@ Feature: Remove an existing client
       | C103     | Carla  | carla@email.com  | pass11111  | Bachata lover  | true      |
 
   # Normal Flow
-  Scenario: Successfully remove an active client
-    Given the client "C102" exists and is not deleted
-    When the admin requests to remove client "C102"
-    Then the client "C102" should be marked as deleted in the system
-    And the message "Client removed successfully" should be displayed
+  Scenario: Client successfully deletes their own active account
+    Given client "C102" exists and is not deleted
+    When client "C102" requests to delete their account
+    Then client "C102" should be marked as deleted in the system
+    And the message "Your account has been deleted" should be displayed
+    And the client should no longer have access to the platform
 
   # Alternate Flow
-  Scenario: Attempt to remove a client who is already removed
-    Given the client "C103" is already deleted
-    When the admin requests to remove client "C103"
-    Then the system should prevent the removal
-    And the message "Client is already removed" should be displayed
+  Scenario: Client tries to delete an already-deleted account
+    Given client "C103" is already deleted
+    When client "C103" requests to delete their account
+    Then the system should not perform the deletion again
+    And the message "This account is already deleted" should be displayed
 
   # Error Flow
-  Scenario: Attempt to remove a non-existent client
-    When the admin requests to remove client "C999"
+  Scenario: Attempt to delete a non-existent client account
+    When client "C999" requests to delete their account
     Then the system should return an error
     And the message "Client not found" should be displayed
