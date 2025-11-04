@@ -13,12 +13,14 @@ Feature: Remove an existing class
       | C001    | studentA        |
       | C001    | studentB        |
 
+  # Normal Flow
   Scenario: Successfully remove a class with no upcoming bookings
     Given the class "C002" has no enrolled students
     When the instructor requests to remove class "C002"
     Then the class "C002" should be deleted from the system
     And the message "Class removed successfully" should be displayed
 
+  # Alternate Flow
   Scenario: Attempt to remove a class that has active student bookings
     Given the class "C001" has enrolled students
     When the instructor requests to remove class "C001"
@@ -26,6 +28,7 @@ Feature: Remove an existing class
     And the message "Cannot remove class with active bookings" should be displayed
     And the class "C001" should remain active in the system
 
+  # Error Flow
   Scenario: Attempt to remove a non-existent class
     When the instructor requests to remove class "C999"
     Then the system should return an error
