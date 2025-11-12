@@ -18,4 +18,5 @@ public interface SpecificClassRepository extends CrudRepository<SpecificClass, I
     Iterable<SpecificClass> findSpecificClassByLocation(String location);
     Iterable<SpecificClass> findSpecificClassByDate(LocalDate date);
     Iterable<SpecificClass> findSpecificClassByDateBetween(LocalDate startDate, LocalDate endDate);
+    boolean existsByInstructorEmailAndIsDeletedFalse(String email);
 }

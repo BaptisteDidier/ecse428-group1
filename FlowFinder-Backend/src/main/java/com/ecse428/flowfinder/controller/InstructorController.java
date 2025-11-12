@@ -24,4 +24,12 @@ public class InstructorController {
     public InstructorResponse registerInstructor(@Valid @RequestBody CreateInstructorRequest req) {
         return instructorService.createInstructor(req);
     }
+
+    @DeleteMapping("/{email}")
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteInstructor(@PathVariable String email) {
+        return instructorService.deleteInstructorByEmail(email);
+    }
 }
+
+

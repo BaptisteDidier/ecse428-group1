@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,6 +64,44 @@ class InstructorServiceTests {
     }
 
     @Test
+    void ST003_01_createInstructor_Success() {
+        CreateInstructorRequest req = new CreateInstructorRequest();
+        req.setName("Jane Doe");
+        req.setEmail("jane@example.com");
+        req.setPassword("pass123");
+        req.setSpecificClassIds(Arrays.asList(1L, 2L));
+
+        when(personRepo.existsByEmail("jane@example.com")).thenReturn(false);
+        when(instructorRepo.save(any(Instructor.class))).thenReturn(instructor);
+        when(specificClassRepo.findByIdIn(Arrays.asList(1L, 2L))).thenReturn(Arrays.asList(sc1, sc2));
+
+        InstructorResponse response  = instructorService.createInstructor(req);
+
+        assertNotNull(response);
+        assertEquals("Jane Doe", response.getName());
+        assertEquals(2, response.getAssignedSpecificClassIds().size());
+        verify(instructorRepo, times(1)).save(any(Instructor.class));
+        verify(specificClassRepo, times(1)).saveAll(anyList());
+    }
+
+
+    @Test
+    void ST003_02_createInstructor_NoSpecificClasses() {
+        CreateInstructorRequest req = new CreateInstructorRequest();
+        req.setName("Jane Doe");
+        req.setEmail("jane@example.com");
+        req.setPassword("pass123");
+        req.setSpecificClassIds(List.of());
+
+        when(personRepo.existsByEmail("jane@example.com")).thenReturn(false);
+
+        FlowFinderException ex = assertThrows(FlowFinderException.class, () -> instructorService.createInstructor(req));
+        assertEquals("At least one scheduled class (SpecificClass) must be assigned", ex.getMessage());
+        verify(instructorRepo, never()).save(any());
+    }
+
+
+    @Test
     void ST003_03_createInstructor_MissingName() {
         CreateInstructorRequest req = new CreateInstructorRequest();
         req.setName(null); // Missing Name (or use "  " for empty string)
@@ -79,7 +118,6 @@ class InstructorServiceTests {
 
     }
 
-    // --- NEW TEST: ST003 Validation - Missing Password ---
     @Test
     void ST003_03_createInstructor_MissingPassword() {
         CreateInstructorRequest req = new CreateInstructorRequest();
@@ -119,27 +157,6 @@ class InstructorServiceTests {
     }
 
     @Test
-    void ST003_01_createInstructor_Success() {
-        CreateInstructorRequest req = new CreateInstructorRequest();
-        req.setName("Jane Doe");
-        req.setEmail("jane@example.com");
-        req.setPassword("pass123");
-        req.setSpecificClassIds(Arrays.asList(1L, 2L));
-
-        when(personRepo.existsByEmail("jane@example.com")).thenReturn(false);
-        when(instructorRepo.save(any(Instructor.class))).thenReturn(instructor);
-        when(specificClassRepo.findByIdIn(Arrays.asList(1L, 2L))).thenReturn(Arrays.asList(sc1, sc2));
-
-        InstructorResponse response  = instructorService.createInstructor(req);
-
-        assertNotNull(response);
-        assertEquals("Jane Doe", response.getName());
-        assertEquals(2, response.getAssignedSpecificClassIds().size());
-        verify(instructorRepo, times(1)).save(any(Instructor.class));
-        verify(specificClassRepo, times(1)).saveAll(anyList());
-    }
-
-    @Test
     void ST003_04_createInstructor_DuplicateEmail() {
         CreateInstructorRequest req = new CreateInstructorRequest();
         req.setName("Jane Doe");
@@ -155,17 +172,44 @@ class InstructorServiceTests {
     }
 
     @Test
-    void ST003_02_createInstructor_NoSpecificClasses() {
-        CreateInstructorRequest req = new CreateInstructorRequest();
-        req.setName("Jane Doe");
-        req.setEmail("jane@example.com");
-        req.setPassword("pass123");
-        req.setSpecificClassIds(List.of());
+    void ST004_01_RemoveInstructor_NoAssignedClasses() {
+        Instructor emma = new Instructor("Emma Lee", "Latin specialist", "emma@flow.com",
+                "safePass", LocalDate.of(2025, 10, 5), false);
 
-        when(personRepo.existsByEmail("jane@example.com")).thenReturn(false);
+        when(instructorRepo.findByEmail("emma@flow.com")).thenReturn(Optional.of(emma));
+        when(specificClassRepo.existsByInstructorEmailAndIsDeletedFalse("emma@flow.com")).thenReturn(false);
 
-        FlowFinderException ex = assertThrows(FlowFinderException.class, () -> instructorService.createInstructor(req));
-        assertEquals("At least one scheduled class (SpecificClass) must be assigned", ex.getMessage());
+        String result = instructorService.deleteInstructorByEmail("emma@flow.com");
+
+        assertEquals("Instructor removed successfully", result);
+        assertTrue(emma.getIsDeleted());
+        verify(instructorRepo, times(1)).save(emma);
+    }
+
+    @Test
+    void ST004_02_RemoveInstructor_WithActiveClasses() {
+        Instructor sarah = new Instructor("Sarah Connor", "Contemporary lead", "sarah@flow.com",
+                "pass12345", LocalDate.of(2025, 10, 1), false);
+
+        when(instructorRepo.findByEmail("sarah@flow.com")).thenReturn(Optional.of(sarah));
+        when(specificClassRepo.existsByInstructorEmailAndIsDeletedFalse("sarah@flow.com")).thenReturn(true);
+
+        IllegalStateException ex = assertThrows(IllegalStateException.class,
+                () -> instructorService.deleteInstructorByEmail("sarah@flow.com"));
+
+        assertEquals("Cannot remove instructor with active classes", ex.getMessage());
+        assertFalse(sarah.getIsDeleted());
+        verify(instructorRepo, never()).save(any());
+    }
+
+    @Test
+    void ST004_03_RemoveInstructor_NonExistent() {
+        when(instructorRepo.findByEmail("nonexistent@flow.com")).thenReturn(Optional.empty());
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> instructorService.deleteInstructorByEmail("nonexistent@flow.com"));
+
+        assertEquals("Instructor not found", ex.getMessage());
         verify(instructorRepo, never()).save(any());
     }
 }

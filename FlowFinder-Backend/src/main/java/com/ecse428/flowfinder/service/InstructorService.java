@@ -8,6 +8,8 @@ import com.ecse428.flowfinder.model.SpecificClass;
 import com.ecse428.flowfinder.repository.InstructorRepository;
 import com.ecse428.flowfinder.repository.PersonRepository;
 import com.ecse428.flowfinder.repository.SpecificClassRepository;
+
+import java.util.Optional;
 import java.util.regex.Pattern;
 import jakarta.transaction.Transactional;
 
@@ -89,5 +91,28 @@ public class InstructorService {
         specificClassRepo.saveAll(classes);
 
         return InstructorResponse.from(inst, classes);
+    }
+
+    @Transactional
+    public String deleteInstructorByEmail(String email) {
+        Optional<Instructor> instructorOpt = instructorRepo.findByEmail(email);
+
+        if (instructorOpt.isEmpty()) {
+            throw new IllegalArgumentException("Instructor not found");
+        }
+
+        Instructor instructor = instructorOpt.get();
+
+        // Check if the instructor has any active (non-deleted) specific classes
+        boolean hasActiveClasses = specificClassRepo.existsByInstructorEmailAndIsDeletedFalse(email);
+        if (hasActiveClasses) {
+            throw new IllegalStateException("Cannot remove instructor with active classes");
+        }
+
+        // Mark as deleted
+        instructor.setIsDeleted(true);
+        instructorRepo.save(instructor);
+
+        return "Instructor removed successfully";
     }
 }
