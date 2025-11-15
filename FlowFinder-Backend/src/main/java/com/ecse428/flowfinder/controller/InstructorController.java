@@ -1,5 +1,6 @@
 package com.ecse428.flowfinder.controller;
 
+import com.ecse428.flowfinder.dto.DeleteInstructorResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.ecse428.flowfinder.dto.CreateInstructorRequest;
 import com.ecse428.flowfinder.dto.InstructorResponse;
@@ -24,4 +25,12 @@ public class InstructorController {
     public InstructorResponse registerInstructor(@Valid @RequestBody CreateInstructorRequest req) {
         return instructorService.createInstructor(req);
     }
+
+    @DeleteMapping("/{email}")
+    @ResponseStatus(HttpStatus.OK)
+    public DeleteInstructorResponse deleteInstructor(@PathVariable String email) {
+        return instructorService.deleteInstructorByEmail(email);
+    }
 }
+
+
