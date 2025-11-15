@@ -1,6 +1,7 @@
 package com.ecse428.flowfinder.service;
 
 import com.ecse428.flowfinder.dto.CreateInstructorRequest;
+import com.ecse428.flowfinder.dto.DeleteInstructorResponse;
 import com.ecse428.flowfinder.dto.InstructorResponse;
 import com.ecse428.flowfinder.exception.FlowFinderException;
 import com.ecse428.flowfinder.model.Instructor;
@@ -92,27 +93,26 @@ public class InstructorService {
 
         return InstructorResponse.from(inst, classes);
     }
-
     @Transactional
-    public String deleteInstructorByEmail(String email) {
+    public DeleteInstructorResponse deleteInstructorByEmail(String email) {
         Optional<Instructor> instructorOpt = instructorRepo.findByEmail(email);
 
         if (instructorOpt.isEmpty()) {
-            throw new IllegalArgumentException("Instructor not found");
+            throw new FlowFinderException(HttpStatus.NOT_FOUND, "Instructor not found");
         }
 
         Instructor instructor = instructorOpt.get();
 
-        // Check if the instructor has any active (non-deleted) specific classes
+        // Check for active classes
         boolean hasActiveClasses = specificClassRepo.existsByInstructorEmailAndIsDeletedFalse(email);
         if (hasActiveClasses) {
-            throw new IllegalStateException("Cannot remove instructor with active classes");
+            throw new FlowFinderException(HttpStatus.CONFLICT, "Cannot remove instructor with active classes");
         }
 
-        // Mark as deleted
         instructor.setIsDeleted(true);
         instructorRepo.save(instructor);
 
-        return "Instructor removed successfully";
+        return new DeleteInstructorResponse(email, "Instructor removed successfully");
     }
+
 }

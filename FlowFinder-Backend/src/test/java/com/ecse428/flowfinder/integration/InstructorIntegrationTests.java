@@ -14,6 +14,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.hamcrest.Matchers.hasItem;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.hamcrest.Matchers.is;
+
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -73,7 +79,6 @@ public class InstructorIntegrationTests {
         );
     }
 
-    // ✅ ST003_01
     @Test
     public void ST003_01_testAddNewInstructor_SuccessfulAssignment() throws Exception {
         String requestBody = String.format("""
@@ -96,7 +101,6 @@ public class InstructorIntegrationTests {
 ;
     }
 
-    // ✅ ST003_02
     @Test
     public void ST003_02_testAddNewInstructor_FailNoSpecificClassSelected() throws Exception {
         String requestBody = """
@@ -117,7 +121,6 @@ public class InstructorIntegrationTests {
 
     }
 
-    // ✅ ST003_03
     @Test
     public void ST003_03_testAddNewInstructor_FailMissingRequiredDetails() throws Exception {
         String requestBody = String.format("""
@@ -142,7 +145,6 @@ public class InstructorIntegrationTests {
                 )));
     }
 
-    // ✅ ST003_04
     @Test
     public void ST003_04_testAddNewInstructor_FailDuplicateEmail() throws Exception {
         String requestBody = String.format("""
@@ -204,4 +206,43 @@ public class InstructorIntegrationTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors[0]").value("New instructors must not be created as deleted"));;
     }
+
+
+    @Test
+    public void ST004_01_testDeleteInstructorSuccess() throws Exception {
+        // First, create an instructor with no assigned classes
+        Instructor emma = instructorRepository.save(
+                new Instructor("Emma Lee", "Latin specialist", "emma@flow.com",
+                        "safePass123", LocalDate.of(2025, 10, 5), false)
+        );
+
+        mockMvc.perform(delete("/instructors/emma@flow.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email", is("emma@flow.com")))
+                .andExpect(jsonPath("$.message", is("Instructor removed successfully")));
+
+        // Verify in DB that the instructor is marked deleted
+        Instructor deletedInstructor = instructorRepository.findByEmail("emma@flow.com").get();
+        assertTrue(deletedInstructor.getIsDeleted());
+    }
+
+    @Test
+    public void ST004_02_testDeleteInstructorWithActiveClasses() throws Exception {
+        // Sarah already has beginnerBallet assigned in setup
+        mockMvc.perform(delete("/instructors/sarah@flow.com"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.message", is("Cannot remove instructor with active classes")));
+
+        // Verify instructor is still active
+        Instructor sarah = instructorRepository.findByEmail("sarah@flow.com").get();
+        assertFalse(sarah.getIsDeleted());
+    }
+
+    @Test
+    public void ST004_03_testDeleteNonExistentInstructor() throws Exception {
+        mockMvc.perform(delete("/instructors/nonexistent@flow.com"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message", is("Instructor not found")));
+    }
+
 }

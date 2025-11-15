@@ -1,6 +1,7 @@
 package com.ecse428.flowfinder.service;
 
 import com.ecse428.flowfinder.dto.CreateInstructorRequest;
+import com.ecse428.flowfinder.dto.DeleteInstructorResponse;
 import com.ecse428.flowfinder.dto.InstructorResponse;
 import com.ecse428.flowfinder.exception.FlowFinderException;
 import com.ecse428.flowfinder.model.Instructor;
@@ -11,6 +12,7 @@ import com.ecse428.flowfinder.repository.SpecificClassRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -54,13 +56,12 @@ class InstructorServiceTests {
         sc1.setStartTime(LocalTime.of(18, 0));
         sc1.setEndTime(LocalTime.of(19, 0));
         sc1.setDate(LocalDate.of(2025, 11, 3));
-     
 
         sc2 = new SpecificClass();
         sc2.setStartTime(LocalTime.of(19, 30));
         sc2.setEndTime(LocalTime.of(20, 30));
         sc2.setDate(LocalDate.of(2025, 11, 5));
-       
+
     }
 
     @Test
@@ -99,7 +100,6 @@ class InstructorServiceTests {
         assertEquals("At least one scheduled class (SpecificClass) must be assigned", ex.getMessage());
         verify(instructorRepo, never()).save(any());
     }
-
 
     @Test
     void ST003_03_createInstructor_MissingName() {
@@ -179,37 +179,44 @@ class InstructorServiceTests {
         when(instructorRepo.findByEmail("emma@flow.com")).thenReturn(Optional.of(emma));
         when(specificClassRepo.existsByInstructorEmailAndIsDeletedFalse("emma@flow.com")).thenReturn(false);
 
-        String result = instructorService.deleteInstructorByEmail("emma@flow.com");
+        DeleteInstructorResponse response = instructorService.deleteInstructorByEmail("emma@flow.com");
 
-        assertEquals("Instructor removed successfully", result);
-        assertTrue(emma.getIsDeleted());
-        verify(instructorRepo, times(1)).save(emma);
+        // Assert
+        assertEquals("emma@flow.com", response.getEmail());
+        assertEquals("Instructor removed successfully", response.getMessage());
     }
 
     @Test
     void ST004_02_RemoveInstructor_WithActiveClasses() {
-        Instructor sarah = new Instructor("Sarah Connor", "Contemporary lead", "sarah@flow.com",
-                "pass12345", LocalDate.of(2025, 10, 1), false);
-
+        //Arrange
+        Instructor sarah = new Instructor("Sarah Connor", "Contemporary lead",
+                "sarah@flow.com", "pass12345", LocalDate.of(2025, 10, 1), false);
         when(instructorRepo.findByEmail("sarah@flow.com")).thenReturn(Optional.of(sarah));
-        when(specificClassRepo.existsByInstructorEmailAndIsDeletedFalse("sarah@flow.com")).thenReturn(true);
 
-        IllegalStateException ex = assertThrows(IllegalStateException.class,
+        when(specificClassRepo.existsByInstructorEmailAndIsDeletedFalse("sarah@flow.com")).thenReturn(true);
+        //Act
+        FlowFinderException ex = assertThrows(FlowFinderException.class,
                 () -> instructorService.deleteInstructorByEmail("sarah@flow.com"));
 
+        //Assert
         assertEquals("Cannot remove instructor with active classes", ex.getMessage());
-        assertFalse(sarah.getIsDeleted());
+        assertEquals(HttpStatus.CONFLICT, ex.getStatus());
+
         verify(instructorRepo, never()).save(any());
     }
 
     @Test
     void ST004_03_RemoveInstructor_NonExistent() {
+        //Act
         when(instructorRepo.findByEmail("nonexistent@flow.com")).thenReturn(Optional.empty());
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+        FlowFinderException ex = assertThrows(FlowFinderException.class,
                 () -> instructorService.deleteInstructorByEmail("nonexistent@flow.com"));
-
+        //Assert
         assertEquals("Instructor not found", ex.getMessage());
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatus());
+
         verify(instructorRepo, never()).save(any());
     }
+
 }
