@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.ecse428.flowfinder.exception.FlowFinderException;
 import com.ecse428.flowfinder.model.DanceClass;
+import com.ecse428.flowfinder.model.SpecificClass;
 import com.ecse428.flowfinder.repository.DanceClassRepository;
 
 import jakarta.transaction.Transactional;
@@ -15,6 +16,8 @@ public class DanceClassService {
 
     @Autowired
     private DanceClassRepository danceClassRepository;
+    @Autowired
+    private SpecificClassService specificClassService;
 
     @Transactional
     public DanceClass createDanceClass(boolean isPrivate, String name, String genre, String description) {
