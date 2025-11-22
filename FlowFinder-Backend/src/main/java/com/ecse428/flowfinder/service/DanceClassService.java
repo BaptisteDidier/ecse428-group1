@@ -46,4 +46,38 @@ public class DanceClassService {
         validate(genre, "Genre");
         return danceClassRepository.findByGenreIgnoreCase(genre);
     }
+
+    @Transactional
+    public DanceClass deleteDanceClass(String name) {
+        validate(name, "Name");
+
+        // Find class by name (case-insensitive)
+        DanceClass danceClass = null;
+        for (DanceClass dc : danceClassRepository.findAll()) {
+            if (dc.getName().equalsIgnoreCase(name)) {
+                danceClass = dc;
+                break;
+            }
+        }
+
+        if (danceClass == null) {
+            throw new FlowFinderException(HttpStatus.NOT_FOUND,
+                String.format("Dance class with name '%s' does not exist.", name));
+        }
+
+        //Check if any SpecificClass exists for this DanceClass
+        Iterable<SpecificClass> specificClasses = 
+            specificClassService.getSpecificClassesByDanceClass(danceClass);
+
+        if (specificClasses.iterator().hasNext()) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST,
+                String.format("Cannot delete '%s' because specific classes exist for this dance class.",
+                            danceClass.getName()));
+        }
+
+        danceClassRepository.delete(danceClass);
+        return danceClass;
+    }
+
+    
 }

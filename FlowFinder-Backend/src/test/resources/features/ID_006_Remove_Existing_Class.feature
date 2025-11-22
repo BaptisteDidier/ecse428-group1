@@ -14,23 +14,23 @@ Feature: Remove an existing class
       | C001    | studentB        |
 
   # Normal Flow
-  Scenario: Successfully remove a class with no upcoming bookings
-    Given the class "C002" has no enrolled students
-    When the instructor requests to remove class "C002"
-    Then the class "C002" should be deleted from the system
+  Scenario: Successfully remove a class by name with no upcoming bookings
+    Given the class "Hip Hop Fusion" has no enrolled students
+    When the instructor requests to remove class "Hip Hop Fusion"
+    Then the class "Hip Hop Fusion" should be deleted from the system
     And the message "Class removed successfully" should be displayed
 
   # Alternate Flow
   Scenario: Attempt to remove a class that has active student bookings
-    Given the class "C001" has enrolled students
-    When the instructor requests to remove class "C001"
+    Given the class "Beginner Salsa" has enrolled students
+    When the instructor requests to remove class "Beginner Salsa"
     Then the system should prevent class deletion
     And the message "Cannot remove class with active bookings" should be displayed
-    And the class "C001" should remain active in the system
+    And the class "Beginner Salsa" should remain active in the system
 
   # Error Flow
   Scenario: Attempt to remove a non-existent class
-    When the instructor requests to remove class "C999"
+    When the instructor requests to remove class "Vogue"
     Then the system should return an error
     And the message "Class not found" should be displayed
 
