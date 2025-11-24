@@ -5,6 +5,7 @@ import com.ecse428.flowfinder.model.Client;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -13,8 +14,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import java.util.Optional;
-
-
+import java.util.Collections;
+import java.beans.Transient;
 import java.time.LocalDate;
 
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
 import com.ecse428.flowfinder.repository.ClientRepository;
+import com.ecse428.flowfinder.repository.RegistrationRepository;
+
 
 @SpringBootTest
 public class ClientServiceTests {
@@ -32,9 +35,13 @@ public class ClientServiceTests {
     @Mock
     private ClientRepository clientRepository;
 
+    @Mock
+    private RegistrationRepository registrationRepository;
+
     @InjectMocks
     private ClientService clientService;
 
+    private static final int validId = 8;
     private static final String validName = "name";
     private static final String validBio = "Hi everyone!";
     private static final String validEmail = "email@gmail.com";
@@ -43,6 +50,7 @@ public class ClientServiceTests {
 
     private static final String emptyString = "";
     private static final String invalidEmail = "email";
+    private static final int invalidId = -1;
 
     @Test
     public void US001_01_testRegisterClient_Successful() {
@@ -141,5 +149,38 @@ public void US001_06_testGetClientById_NotFound() {
     assertEquals("No client found with ID 999", exception.getMessage());
 
     verify(clientRepository, times(1)).findById(999);
+}
+
+@Test
+public void US002_01_testRemoveClient_Successful() {
+    Client client = new Client(validName, validBio, validEmail, validPassword, validDate, false);
+    when(clientRepository.findClientById(validId)).thenReturn(client);
+    when(registrationRepository.findByKey_ParticipantId(validId))
+            .thenReturn(Collections.emptyList());
+
+    clientService.deleteClient(validId);
+
+    assertTrue(client.getIsDeleted());
+}
+
+@Test
+public void US002_02_testRemoveClient_AlreadyDeleted() {
+    Client client = new Client(validName, validBio, validEmail, validPassword, validDate, true);
+    when(clientRepository.findClientById(validId)).thenReturn(client);
+    FlowFinderException exception = assertThrows(FlowFinderException.class, 
+            () -> clientService.deleteClient(validId));
+
+    assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
+    assertEquals("The account is already deleted", exception.getMessage());
+}
+
+@Test 
+public void US002_03_testRemoveClient_InvalidId() {
+    when(clientRepository.findClientById(invalidId)).thenReturn(null);
+    FlowFinderException exception = assertThrows(FlowFinderException.class, 
+            () -> clientService.deleteClient(invalidId));
+    
+    assertEquals(HttpStatus.NOT_FOUND, exception.getStatus());
+    assertEquals(String.format("There is no account with id %s", invalidId), exception.getMessage());
 }
 }

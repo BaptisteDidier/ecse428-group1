@@ -30,4 +30,4 @@ Feature: Remove my client account
   Scenario: Attempt to delete a non-existent client account
     When client "C999" requests to delete their account
     Then the system should return an error
-    And the message "Client not found" should be displayed
+    And the message "There is no account with id C999" should be displayed
