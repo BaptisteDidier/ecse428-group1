@@ -219,4 +219,46 @@ class InstructorServiceTests {
         verify(instructorRepo, never()).save(any());
     }
 
+    @Test
+    void ST004_04_RemoveInstructor_InvalidEmailFormat() {
+    
+        FlowFinderException ex = assertThrows(
+                FlowFinderException.class,
+                () -> instructorService.deleteInstructorByEmail("invalid-email")
+        );
+    
+        assertEquals("Invalid email format", ex.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
+    
+        verify(instructorRepo, never()).findByEmail(any());
+    }
+
+    @Test
+    void ST004_05_RemoveInstructor_EmptyEmail() {
+    
+        FlowFinderException ex = assertThrows(
+                FlowFinderException.class,
+                () -> instructorService.deleteInstructorByEmail("  ")
+        );
+    
+        assertEquals("email is required", ex.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
+    
+        verify(instructorRepo, never()).findByEmail(any());
+    }
+
+    @Test
+    void ST004_06_RemoveInstructor_NullEmail() {
+    
+        FlowFinderException ex = assertThrows(
+                FlowFinderException.class,
+                () -> instructorService.deleteInstructorByEmail(null)
+        );
+    
+        assertEquals("email is required", ex.getMessage());
+        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
+    
+        verify(instructorRepo, never()).findByEmail(any());
+    }
+           
 }

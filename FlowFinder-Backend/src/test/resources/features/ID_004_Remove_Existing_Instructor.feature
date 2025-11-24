@@ -6,17 +6,17 @@ Feature: Remove an existing instructor
   Background:
     Given the system is running
     And the following dance classes exist:
-      | name             | genre         | description           | isPrivate |
-      | Beginner Ballet  | Ballet        | Intro to basic ballet | false     |
-      | Latin Basics     | Latin         | Salsa & bachata intro | false     |
+      | name             | genre   | description           | isPrivate |
+      | Beginner Ballet  | Ballet  | Intro to basic ballet | false     |
+      | Latin Basics     | Latin   | Salsa & bachata intro | false     |
     And the following specific classes exist:
       | className       | date       | start  | end    | location  | limit | isDeleted |
       | Beginner Ballet | 2025-11-03 | 18:00  | 19:00  | Studio A  | 20    | false     |
       | Latin Basics    | 2025-11-07 | 17:30  | 18:30  | Studio C  | 18    | false     |
     And the following instructors exist:
-      | name           | bio                | email            | password  | creationDate | isDeleted |
-      | Sarah Connor   | Contemporary lead  | sarah@flow.com   | pass12345 | 2025-10-01   | false     |
-      | Emma Lee       | Latin specialist   | emma@flow.com    | safePass  | 2025-10-05   | false     |
+      | name         | bio                  | email           | password  | creationDate | isDeleted |
+      | Sarah Connor | Contemporary lead    | sarah@flow.com  | pass12345 | 2025-10-01   | false     |
+      | Emma Lee     | Latin specialist     | emma@flow.com   | safePass  | 2025-10-05   | false     |
     And the following instructors are assigned to specific classes:
       | instructorEmail | className       | date       | start  |
       | sarah@flow.com  | Beginner Ballet | 2025-11-03 | 18:00  |
@@ -25,20 +25,36 @@ Feature: Remove an existing instructor
   # Normal Flow
   Scenario: Successfully remove an instructor with no assigned specific classes
     Given the instructor "Emma Lee" has no assigned specific classes
-    When the application manager remove the instructor with email "emma@flow.com"
+    When the application manager removes the instructor with email "emma@flow.com"
     Then the instructor "Emma Lee" should be marked as deleted
     And the message "Instructor removed successfully" should be displayed
 
-  # Alternate flow
+  # Alternate Flow
   Scenario: Attempt to remove an instructor with assigned active specific classes
     Given the instructor "Sarah Connor" has assigned active specific classes
-    When the application manager attempt to remove the instructor with email "sarah@flow.com"
-    Then the system should prevent instructor removal
+    When the application manager attempts to remove the instructor with email "sarah@flow.com"
+    Then the system should prevent the instructor from being removed
     And the message "Cannot remove instructor with active classes" should be displayed
     And the instructor "Sarah Connor" should remain active in the system
-  
+
   # Error Flow
   Scenario: Attempt to remove a non-existent instructor
-    When the application manager attempt to remove an instructor with email "nonexistent@flow.com"
+    When the application manager attempts to remove the instructor with email "nonexistent@flow.com"
     Then the system should return an error
     And the message "Instructor not found" should be displayed
+
+  # Validation Flow (Preconditions)
+  Scenario: Attempt to remove an instructor with an invalid email format
+    When the application manager attempts to remove the instructor with email "invalid-email"
+    Then the system should return an error
+    And the message "Invalid email format" should be displayed
+
+  Scenario: Attempt to remove an instructor with an empty email
+    When the application manager attempts to remove the instructor with email ""
+    Then the system should return an error
+    And the message "Email is required" should be displayed
+
+  Scenario: Attempt to remove an instructor without providing an email
+    When the application manager attempts to remove the instructor with email "null"
+    Then the system should return an error
+    And the message "Email is required" should be displayed

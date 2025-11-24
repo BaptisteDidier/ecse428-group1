@@ -20,9 +20,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 @Service
 public class InstructorService {
+
+    private static final Logger logger = LoggerFactory.getLogger(InstructorService.class);
 
     @Autowired
     private InstructorRepository instructorRepo;
@@ -95,9 +100,13 @@ public class InstructorService {
     }
     @Transactional
     public DeleteInstructorResponse deleteInstructorByEmail(String email) {
+        logger.info("ST004 - Request to remove instructor with email={}", email);
+
+        validateInstructorRemovalInput(email);
         Optional<Instructor> instructorOpt = instructorRepo.findByEmail(email);
 
         if (instructorOpt.isEmpty()) {
+            logger.warn("ST004 - Removal failed: instructor with email={} not found", email);
             throw new FlowFinderException(HttpStatus.NOT_FOUND, "Instructor not found");
         }
 
@@ -106,13 +115,27 @@ public class InstructorService {
         // Check for active classes
         boolean hasActiveClasses = specificClassRepo.existsByInstructorEmailAndIsDeletedFalse(email);
         if (hasActiveClasses) {
+            logger.warn("ST004 - Removal failed: instructor with email={} has active classes", email);
             throw new FlowFinderException(HttpStatus.CONFLICT, "Cannot remove instructor with active classes");
         }
 
         instructor.setIsDeleted(true);
         instructorRepo.save(instructor);
 
+        logger.info("ST004 - Instructor with email={} successfully marked as deleted", email);
+
         return new DeleteInstructorResponse(email, "Instructor removed successfully");
     }
 
+    private void validateInstructorRemovalInput(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "email is required");
+        }
+        Pattern VALID_EMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
+        if (!VALID_EMAIL.matcher(email).matches()) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Invalid email format");
+        }
+        
+    }
 }
