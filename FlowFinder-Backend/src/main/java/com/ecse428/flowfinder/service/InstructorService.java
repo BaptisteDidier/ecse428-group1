@@ -95,6 +95,7 @@ public class InstructorService {
     }
     @Transactional
     public DeleteInstructorResponse deleteInstructorByEmail(String email) {
+        validateInstructorRemovalInput(email);
         Optional<Instructor> instructorOpt = instructorRepo.findByEmail(email);
 
         if (instructorOpt.isEmpty()) {
@@ -115,4 +116,15 @@ public class InstructorService {
         return new DeleteInstructorResponse(email, "Instructor removed successfully");
     }
 
+    private void validateInstructorRemovalInput(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "email is required");
+        }
+        Pattern VALID_EMAIL = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
+        if (!VALID_EMAIL.matcher(email).matches()) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Invalid email format");
+        }
+        
+    }
 }
