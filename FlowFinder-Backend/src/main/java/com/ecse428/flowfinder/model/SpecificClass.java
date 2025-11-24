@@ -38,6 +38,8 @@ public class SpecificClass {
     instructor = aInstructor;
   }
 
+  //public SpecificClass() {}
+
   public void setLocation(String aLocation) {
     location = aLocation;
   }

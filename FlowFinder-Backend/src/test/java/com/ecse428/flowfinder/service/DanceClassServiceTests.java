@@ -3,6 +3,12 @@ package com.ecse428.flowfinder.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -15,6 +21,7 @@ import org.springframework.http.HttpStatus;
 
 import com.ecse428.flowfinder.exception.FlowFinderException;
 import com.ecse428.flowfinder.model.DanceClass;
+import com.ecse428.flowfinder.model.SpecificClass;
 import com.ecse428.flowfinder.repository.DanceClassRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -22,6 +29,8 @@ public class DanceClassServiceTests {
 
     @Mock
     private DanceClassRepository danceClassRepository;
+    @Mock
+    private SpecificClassService specificClassService;
 
     @InjectMocks
     private DanceClassService danceClassService;
@@ -80,5 +89,44 @@ public class DanceClassServiceTests {
         
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatus());
         assertTrue(exception.getMessage().contains("Genre cannot be null or empty"));
+    }
+
+    @Test
+    public void ST006_01_testDeleteDanceClass_Success() {
+        DanceClass dc = new DanceClass(false, "Jazz Class", "Jazz", "Fun class");
+
+        when(danceClassRepository.findAll()).thenReturn(Arrays.asList(dc));
+        when(specificClassService.getSpecificClassesByDanceClass(dc))
+                .thenReturn(Collections.emptyList());
+
+        DanceClass result = danceClassService.deleteDanceClass("Jazz Class");
+
+        assertNotNull(result);
+        verify(danceClassRepository, times(1)).delete(dc);
+    }
+
+    @Test
+    public void ST006_03_testDeleteDanceClass_NotFound() {
+        when(danceClassRepository.findAll()).thenReturn(Collections.emptyList());
+
+        FlowFinderException ex = assertThrows(FlowFinderException.class,
+                () -> danceClassService.deleteDanceClass("Unknown"));
+
+        assertEquals(HttpStatus.NOT_FOUND, ex.getStatus());
+    }
+
+    @Test
+    public void ST006_02_testDeleteDanceClass_HasSpecificClasses() {
+        DanceClass dc = new DanceClass(false, "Tap Class", "Tap", "Tap dancing");
+
+        when(danceClassRepository.findAll()).thenReturn(Arrays.asList(dc));
+        when(specificClassService.getSpecificClassesByDanceClass(dc))
+                .thenReturn(Arrays.asList(mock(SpecificClass.class)));
+
+        FlowFinderException ex = assertThrows(FlowFinderException.class,
+                () -> danceClassService.deleteDanceClass("Tap Class"));
+
+        assertEquals(HttpStatus.BAD_REQUEST, ex.getStatus());
+        verify(danceClassRepository, never()).delete(any());
     }
 }
