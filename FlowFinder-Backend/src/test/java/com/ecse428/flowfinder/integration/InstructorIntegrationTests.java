@@ -6,6 +6,9 @@ import com.ecse428.flowfinder.model.SpecificClass;
 import com.ecse428.flowfinder.repository.DanceClassRepository;
 import com.ecse428.flowfinder.repository.InstructorRepository;
 import com.ecse428.flowfinder.repository.SpecificClassRepository;
+
+import jakarta.transaction.Transactional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.hamcrest.Matchers.is;
 
 
@@ -30,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@Transactional
 public class InstructorIntegrationTests {
 
     @Autowired
@@ -73,10 +76,15 @@ public class InstructorIntegrationTests {
                 new SpecificClass(false, "Studio C", LocalDate.of(2025, 11, 7), 18,
                         LocalTime.of(17, 30), LocalTime.of(18, 30), latinBasicsDance, null));
 
-        instructorRepository.save(
-                new Instructor("Sarah Connor", "Contemporary lead", "sarah@flow.com", "pass12345",
-                        LocalDate.of(2025, 10, 1), false)
+        // Create instructor Sarah
+        Instructor sarah = instructorRepository.save(
+            new Instructor("Sarah Connor", "Contemporary lead", "sarah@flow.com", "pass12345",
+                    LocalDate.of(2025, 10, 1), false)
         );
+
+        // Assign Sarah to beginnerBallet (so she has an active class)
+        beginnerBallet.setInstructor(sarah);
+        specificClassRepository.save(beginnerBallet);
     }
 
     @Test
@@ -231,7 +239,7 @@ public class InstructorIntegrationTests {
         // Sarah already has beginnerBallet assigned in setup
         mockMvc.perform(delete("/instructors/sarah@flow.com"))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message", is("Cannot remove instructor with active classes")));
+                .andExpect(jsonPath("$.errors[0]", is("Cannot remove instructor with active classes")));
 
         // Verify instructor is still active
         Instructor sarah = instructorRepository.findByEmail("sarah@flow.com").get();
@@ -242,7 +250,29 @@ public class InstructorIntegrationTests {
     public void ST004_03_testDeleteNonExistentInstructor() throws Exception {
         mockMvc.perform(delete("/instructors/nonexistent@flow.com"))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message", is("Instructor not found")));
+                .andExpect(jsonPath("$.errors[0]", is("Instructor not found")));
+    }
+
+    @Test
+    public void ST004_04_testDeleteInstructor_InvalidEmailFormat() throws Exception {
+        mockMvc.perform(delete("/instructors/invalid-email"))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errors[0]", is("Invalid email format")));
+    }
+
+    @Test
+    public void ST004_05_testDeleteInstructor_EmptyEmail() throws Exception {
+        mockMvc.perform(delete("/instructors/ "))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.errors[0]", is("email is required")));
+    }
+
+    @Test
+    public void ST004_06_testDeleteInstructor_NullEmail() throws Exception {
+    
+        mockMvc.perform(delete("/instructors/null"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]", is("Invalid email format")));
     }
 
 }
