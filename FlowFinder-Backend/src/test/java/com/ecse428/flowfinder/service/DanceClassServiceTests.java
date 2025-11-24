@@ -92,7 +92,7 @@ public class DanceClassServiceTests {
     }
 
     @Test
-    public void ST006_03_testDeleteDanceClass_Success() {
+    public void ST006_01_testDeleteDanceClass_Success() {
         DanceClass dc = new DanceClass(false, "Jazz Class", "Jazz", "Fun class");
 
         when(danceClassRepository.findAll()).thenReturn(Arrays.asList(dc));
@@ -116,7 +116,7 @@ public class DanceClassServiceTests {
     }
 
     @Test
-    public void ST006_03_testDeleteDanceClass_HasSpecificClasses() {
+    public void ST006_02_testDeleteDanceClass_HasSpecificClasses() {
         DanceClass dc = new DanceClass(false, "Tap Class", "Tap", "Tap dancing");
 
         when(danceClassRepository.findAll()).thenReturn(Arrays.asList(dc));
