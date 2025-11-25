@@ -1,11 +1,12 @@
 package com.ecse428.flowfinder.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public class CreateDanceClassRequest {
 
-    @NotBlank(message = "Privacy must be specified")
-    private boolean isPrivate;
+    @NotNull(message = "Class type is required")
+    private Boolean isPrivate;
 
     @NotBlank(message = "Class name is required")
     private String name;
@@ -17,8 +18,8 @@ public class CreateDanceClassRequest {
     private String description;
     
     // Getters and Setters
-    public boolean getIsPrivate() {return isPrivate;}
-    public void setIsPrivate(boolean isPrivate) {this.isPrivate = isPrivate;}
+    public Boolean getIsPrivate() {return isPrivate;}
+    public void setIsPrivate(Boolean isPrivate) {this.isPrivate = isPrivate;}
     public String getName() {return name;}
     public void setName(String name) {this.name = name;}
     public String getGenre() {return genre;}
