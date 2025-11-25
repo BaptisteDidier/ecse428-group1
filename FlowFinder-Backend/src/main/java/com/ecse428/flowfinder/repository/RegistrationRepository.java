@@ -12,6 +12,7 @@ public interface RegistrationRepository extends CrudRepository<Registration, Reg
     Registration findRegistrationByKey(Registration.Key key);
 
     List<Registration> findByKey_Participant(Client client);
+    List<Registration> findByKey_ParticipantId(int id);
 
     List<Registration> findByKey_DanceClass(SpecificClass specificClass);
 }

@@ -3,6 +3,7 @@ package com.ecse428.flowfinder.service;
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 import java.util.Optional;
+import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,7 +11,9 @@ import org.springframework.stereotype.Service;
 
 import com.ecse428.flowfinder.exception.FlowFinderException;
 import com.ecse428.flowfinder.model.Client;
+import com.ecse428.flowfinder.model.Registration;
 import com.ecse428.flowfinder.repository.ClientRepository;
+import com.ecse428.flowfinder.repository.RegistrationRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -20,9 +23,12 @@ public class ClientService {
     @Autowired
     ClientRepository clientRepository;
 
+    @Autowired
+    private RegistrationRepository registrationRepository;
+
     private final static LocalDate today = LocalDate.now();
     private final static String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
-    //private final static Client deletedClient = new Client("Deleted User", null, null, null, LocalDate.of(1970, 1, 1), true);
+    private final static Client deletedClient = new Client("Deleted User", null, null, null, LocalDate.of(1970, 1, 1), true);
     
     @Transactional
     public Client createClient(String name, String bio, String email, String password) {
@@ -57,6 +63,24 @@ public class ClientService {
         return result.get();
     }
 
+    @Transactional
+    public void deleteClient(int id) {
+        Client client = clientRepository.findClientById(id);
+
+        if (client == null) {
+            throw new FlowFinderException(HttpStatus.NOT_FOUND, 
+            String.format("There is no account with id %s", id));
+        }
+
+        if (client.getIsDeleted()) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, 
+            "The account is already deleted");
+        }
+
+        client.setIsDeleted(true);
+        removeReferences(id);
+    }
+
 
     // Helper function
 
@@ -64,6 +88,13 @@ public class ClientService {
         if (value == null || value.trim().isEmpty()) {
             throw new FlowFinderException(HttpStatus.BAD_REQUEST, 
             String.format("%s cannot be null or empty", name));
+        }
+    }
+
+    private void removeReferences(int id) {
+        Iterable<Registration> registrations = registrationRepository.findByKey_ParticipantId(id);
+        for (Registration registration : registrations) {
+            registrationRepository.delete(registration);
         }
     }
 }
