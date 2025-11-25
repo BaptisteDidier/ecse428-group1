@@ -15,6 +15,7 @@ import com.ecse428.flowfinder.repository.RegistrationRepository;
 import com.ecse428.flowfinder.repository.SpecificClassRepository;
 
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 
 @Service
 public class RegistrationService {
@@ -62,6 +63,12 @@ public class RegistrationService {
                 .orElseThrow(
                         () -> new FlowFinderException(HttpStatus.BAD_REQUEST,
                                 "Class not found with id: " + specificClassId));
+
+        LocalDateTime classStart = LocalDateTime.of(danceClass.getDate(), danceClass.getStart());
+        LocalDateTime cutoff = classStart.minusHours(2);
+        if (LocalDateTime.now().isAfter(cutoff)) {
+            throw new FlowFinderException(HttpStatus.BAD_REQUEST, "Cancellation window has passed");
+        }
 
         Registration.Key key = new Registration.Key(client, danceClass);
 

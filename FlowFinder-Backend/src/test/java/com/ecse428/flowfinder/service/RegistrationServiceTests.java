@@ -139,4 +139,82 @@ public class RegistrationServiceTests {
         verify(registrationRepository, times(0)).save(any(Registration.class));
     }
 
+    // Tests for canceling/deleting registrations based on ID_007 scenarios
+    
+    @Test
+    public void ID_007_01_testDeleteRegistration_successfullyCancelActiveRegistration() {
+        // Normal Flow: Successfully cancel an active registration
+        Registration.Key key = new Key(client, specificClass);
+
+        when(clientRepository.findById(1)).thenReturn(java.util.Optional.of(client));
+        when(specificClassRepository.findById(1)).thenReturn(java.util.Optional.of(specificClass));
+        when(registrationRepository.existsById(key)).thenReturn(true);
+
+        registrationService.deleteRegistration(1, 1);
+
+        verify(registrationRepository, times(1)).deleteById(key);
+    }
+
+    @Test
+    public void ID_007_02_testDeleteRegistration_registrationNotFound() {
+        // Error Flow: Attempt to cancel a non-existent registration
+        Registration.Key key = new Key(client, specificClass);
+
+        when(clientRepository.findById(1)).thenReturn(java.util.Optional.of(client));
+        when(specificClassRepository.findById(1)).thenReturn(java.util.Optional.of(specificClass));
+        when(registrationRepository.existsById(key)).thenReturn(false);
+
+        FlowFinderException exception = assertThrows(FlowFinderException.class, () -> {
+            registrationService.deleteRegistration(1, 1);
+        });
+
+        assertEquals("Registration does not exist.", exception.getMessage());
+        verify(registrationRepository, times(0)).deleteById(any());
+    }
+
+    @Test
+    public void ID_007_03_testDeleteRegistration_clientNotFound() {
+        // Error Flow: Attempt to cancel but client not found
+        when(clientRepository.findById(999)).thenReturn(java.util.Optional.empty());
+
+        FlowFinderException exception = assertThrows(FlowFinderException.class, () -> {
+            registrationService.deleteRegistration(999, 1);
+        });
+
+        assertEquals("Client not found with id: 999", exception.getMessage());
+        verify(registrationRepository, times(0)).deleteById(any());
+    }
+
+    @Test
+    public void ID_007_04_testDeleteRegistration_classNotFound() {
+        // Error Flow: Attempt to cancel but specific class not found
+        when(clientRepository.findById(1)).thenReturn(java.util.Optional.of(client));
+        when(specificClassRepository.findById(999)).thenReturn(java.util.Optional.empty());
+
+        FlowFinderException exception = assertThrows(FlowFinderException.class, () -> {
+            registrationService.deleteRegistration(1, 999);
+        });
+
+        assertEquals("Class not found with id: 999", exception.getMessage());
+        verify(registrationRepository, times(0)).deleteById(any());
+    }
+
+    @Test
+    public void ID_007_05_testDeleteRegistration_cutoffPreventCancellation() {
+        // Attempt to cancel within 2 hours of class start should be prevented
+        // Set class start time to ~1 hour from now
+        specificClass.setDate(java.time.LocalDate.now());
+        specificClass.setStartTime(java.time.LocalTime.now().plusHours(1));
+
+        when(clientRepository.findById(1)).thenReturn(java.util.Optional.of(client));
+        when(specificClassRepository.findById(1)).thenReturn(java.util.Optional.of(specificClass));
+
+        FlowFinderException exception = assertThrows(FlowFinderException.class, () -> {
+            registrationService.deleteRegistration(1, 1);
+        });
+
+        assertEquals("Cancellation window has passed", exception.getMessage());
+        verify(registrationRepository, times(0)).deleteById(any());
+    }
+
 }

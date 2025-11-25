@@ -35,13 +35,6 @@ Feature: Cancel class from a client
     And the message "Registration canceled successfully" should be displayed
 
   # Alternate Flow
-  Scenario: Attempt to cancel an already canceled registration
-    Given the registration "R503" for client "C103" and specific class "SC402" is already CANCELED
-    When the client "C103" requests to cancel registration "R503"
-    Then the system should prevent the cancellation
-    And the message "Registration is already canceled" should be displayed
-
-  # Alternate Flow
   Scenario: Attempt to cancel after cutoff time
     Given the policy is that cancellations must occur at least 2 hours before the start time
     And the current time is within 2 hours of the start time for specific class "SC401"

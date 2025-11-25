@@ -21,6 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -135,6 +136,97 @@ public class RegistrationIntegrationTests {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string("This class is full"));
+    }
+
+    // Tests for registration cancellation/deletion based on ID_007 scenarios
+    @Test
+    public void ID_007_01_testSuccessfulRegistrationCancellation() throws Exception {
+        Client client = clientRepository.save(new Client("client1", "Bio1", "client1@email.com", "pass1234", LocalDate.now(), false));
+        Instructor instructor = instructorRepository.save(new Instructor("instructor1", "BioI", "instructor1@email.com", "pass1234", LocalDate.now(), false));
+        DanceClass danceClass = danceClassRepository.save(new DanceClass(false, "danceClassName1", "danceGenre1", "desc"));
+        // Class scheduled 3 days from now (far enough for cancellation to be allowed)
+        SpecificClass specificClass = specificClassRepository.save(new SpecificClass(false, "Studio A", LocalDate.now().plusDays(3), 12, LocalTime.of(10, 0), LocalTime.of(11, 0), danceClass, instructor));
+
+        // Register client
+        mockMvc.perform(post("/registrations")
+                .param("clientId", String.valueOf(client.getId()))
+                .param("specificClassId", String.valueOf(specificClass.getId()))
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().isCreated());
+
+        // Cancel registration successfully
+        mockMvc.perform(delete("/registrations")
+                .param("clientId", String.valueOf(client.getId()))
+                .param("specificClassId", String.valueOf(specificClass.getId())))
+                .andExpect(status().isNoContent());
+
+        // Verify registration was deleted
+        int registrationCount = Math.toIntExact(registrationRepository.count());
+        assert registrationCount == 0 : "Registration should be deleted";
+    }
+
+    @Test
+    public void ID_007_02_testCancellationFailsIfRegistrationNotFound() throws Exception {
+        Client client = clientRepository.save(new Client("client1", "Bio1", "client1@email.com", "pass1234", LocalDate.now(), false));
+        Instructor instructor = instructorRepository.save(new Instructor("instructor1", "BioI", "instructor1@email.com", "pass1234", LocalDate.now(), false));
+        DanceClass danceClass = danceClassRepository.save(new DanceClass(false, "danceClassName1", "danceGenre1", "desc"));
+        SpecificClass specificClass = specificClassRepository.save(new SpecificClass(false, "Studio A", LocalDate.now().plusDays(3), 12, LocalTime.of(10, 0), LocalTime.of(11, 0), danceClass, instructor));
+
+        // Attempt to cancel non-existent registration
+        mockMvc.perform(delete("/registrations")
+                .param("clientId", String.valueOf(client.getId()))
+                .param("specificClassId", String.valueOf(specificClass.getId())))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Registration does not exist."));
+    }
+
+    @Test
+    public void ID_007_03_testCancellationFailsIfClientNotFound() throws Exception {
+        Instructor instructor = instructorRepository.save(new Instructor("instructor1", "BioI", "instructor1@email.com", "pass1234", LocalDate.now(), false));
+        DanceClass danceClass = danceClassRepository.save(new DanceClass(false, "danceClassName1", "danceGenre1", "desc"));
+        SpecificClass specificClass = specificClassRepository.save(new SpecificClass(false, "Studio A", LocalDate.now().plusDays(3), 12, LocalTime.of(10, 0), LocalTime.of(11, 0), danceClass, instructor));
+
+        // Attempt to cancel with non-existent client
+        mockMvc.perform(delete("/registrations")
+                .param("clientId", "999")
+                .param("specificClassId", String.valueOf(specificClass.getId())))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Client not found with id: 999"));
+    }
+
+    @Test
+    public void ID_007_04_testCancellationFailsIfClassNotFound() throws Exception {
+        Client client = clientRepository.save(new Client("client1", "Bio1", "client1@email.com", "pass1234", LocalDate.now(), false));
+
+        // Attempt to cancel with non-existent class
+        mockMvc.perform(delete("/registrations")
+                .param("clientId", String.valueOf(client.getId()))
+                .param("specificClassId", "999"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Class not found with id: 999"));
+    }
+
+    @Test
+    public void ID_007_05_testCancellationFailsIfWithinCutoffWindow() throws Exception {
+        Client client = clientRepository.save(new Client("client1", "Bio1", "client1@email.com", "pass1234", LocalDate.now(), false));
+        Instructor instructor = instructorRepository.save(new Instructor("instructor1", "BioI", "instructor1@email.com", "pass1234", LocalDate.now(), false));
+        DanceClass danceClass = danceClassRepository.save(new DanceClass(false, "danceClassName1", "danceGenre1", "desc"));
+        // Class scheduled in 1 hour (within 2-hour cutoff)
+        SpecificClass specificClass = specificClassRepository.save(new SpecificClass(false, "Studio A", LocalDate.now(), 12, LocalTime.now().plusHours(1), LocalTime.now().plusHours(2), danceClass, instructor));
+
+        // Register client
+        mockMvc.perform(post("/registrations")
+                .param("clientId", String.valueOf(client.getId()))
+                .param("specificClassId", String.valueOf(specificClass.getId()))
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                .andExpect(status().isCreated());
+
+        // Attempt to cancel within cutoff window
+        mockMvc.perform(delete("/registrations")
+                .param("clientId", String.valueOf(client.getId()))
+                .param("specificClassId", String.valueOf(specificClass.getId())))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("Cancellation window has passed"));
     }
 
 }
