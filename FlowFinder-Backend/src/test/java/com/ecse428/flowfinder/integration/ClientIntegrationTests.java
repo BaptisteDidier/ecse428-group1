@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -21,10 +21,15 @@ public class ClientIntegrationTests {
 
     @Autowired
     private ClientRepository clientRepository;
+    
+    @Autowired
+    private com.ecse428.flowfinder.repository.RegistrationRepository registrationRepository;
 
     @BeforeEach
     public void setup() {
-        clientRepository.deleteAll();  // clean up before each test
+        // Clean registrations first to avoid foreign key violations, then clients
+        registrationRepository.deleteAll();
+        clientRepository.deleteAll();
     }
 
     @Test
@@ -75,5 +80,32 @@ public class ClientIntegrationTests {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Tom"))
                 .andExpect(jsonPath("$.bio").doesNotExist());
+    }
+
+    @Test
+    public void ST002_01_testDeleteClient_Successful() throws Exception {
+        Client client = clientRepository.save(new Client("Alice", "Loves salsa", "alice@email.com", "pass12345", java.time.LocalDate.now(), false));
+
+        mockMvc.perform(delete("/clients/{id}", client.getId()))
+                .andExpect(status().isNoContent());
+
+        Client deleted = clientRepository.findClientById(client.getId());
+        org.junit.jupiter.api.Assertions.assertTrue(deleted.getIsDeleted());
+    }
+
+    @Test
+    public void ST002_02_testDeleteClient_NotFound() throws Exception {
+        mockMvc.perform(delete("/clients/{id}", 999))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("There is no account with id 999"));
+    }
+
+    @Test
+    public void ST002_03_testDeleteClient_AlreadyDeleted() throws Exception {
+        Client client = clientRepository.save(new Client("Bob", "Deleted already", "bob@email.com", "pass12345", java.time.LocalDate.now(), true));
+
+        mockMvc.perform(delete("/clients/{id}", client.getId()))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string("The account is already deleted"));
     }
 }
