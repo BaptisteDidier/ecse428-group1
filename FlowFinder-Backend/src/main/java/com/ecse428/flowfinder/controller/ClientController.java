@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.ecse428.flowfinder.model.Client;
 import com.ecse428.flowfinder.service.ClientService;
+import com.ecse428.flowfinder.exception.FlowFinderException;
 
 @RestController
 @RequestMapping("/clients")
@@ -24,5 +25,21 @@ public class ClientController {
     ) {
         Client createdClient = clientService.createClient(name, bio, email, password);
         return new ResponseEntity<>(createdClient, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteClient(@PathVariable int id) {
+        try {
+            clientService.deleteClient(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (FlowFinderException e) {
+            return ResponseEntity
+                    .status(e.getStatus())
+                    .body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An unexpected error occurred");
+        }
     }
 }
