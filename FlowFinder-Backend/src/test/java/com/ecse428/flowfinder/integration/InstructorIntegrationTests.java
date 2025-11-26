@@ -5,6 +5,7 @@ import com.ecse428.flowfinder.model.Instructor;
 import com.ecse428.flowfinder.model.SpecificClass;
 import com.ecse428.flowfinder.repository.DanceClassRepository;
 import com.ecse428.flowfinder.repository.InstructorRepository;
+import com.ecse428.flowfinder.repository.RegistrationRepository;
 import com.ecse428.flowfinder.repository.SpecificClassRepository;
 
 import jakarta.transaction.Transactional;
@@ -42,6 +43,9 @@ public class InstructorIntegrationTests {
     private InstructorRepository instructorRepository;
 
     @Autowired
+    private RegistrationRepository registrationRepository;
+
+    @Autowired
     private SpecificClassRepository specificClassRepository;
 
     @Autowired
@@ -53,6 +57,7 @@ public class InstructorIntegrationTests {
 
     @BeforeEach
     public void setup() {
+        registrationRepository.deleteAll();
         specificClassRepository.deleteAll();
         danceClassRepository.deleteAll();
         instructorRepository.deleteAll();
